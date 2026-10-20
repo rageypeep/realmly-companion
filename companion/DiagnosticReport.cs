@@ -47,6 +47,7 @@ internal static class DiagnosticReport
             "REALMLY COMPANION DIAGNOSTICS",
             "Created (UTC): " + DateTimeOffset.UtcNow.ToString("u"),
             "Companion: " + typeof(DiagnosticReport).Assembly.GetName().Version?.ToString(3),
+            "Distribution: " + CompanionDistribution.Name,
             "Windows version: " + Environment.OSVersion.Version,
             "Runtime: .NET " + Environment.Version + " / " + RuntimeInformation.ProcessArchitecture,
             "Client: " + snapshot.Client,

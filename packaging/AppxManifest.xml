@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         IgnorableNamespaces="uap uap10 rescap">
+  <!-- Build-Msix.ps1 fills these from Partner Center; do not upload the template. -->
+  <Identity Name="Realmly.Companion.Template" Publisher="CN=Template" Version="0.2.0.0" ProcessorArchitecture="x64" />
+  <Properties>
+    <DisplayName>Realmly Companion</DisplayName>
+    <PublisherDisplayName>Template</PublisherDisplayName>
+    <Description>Keep the Realmly addon current and upload your saved adventures.</Description>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Resources><Resource Language="en-US" /></Resources>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+  <Applications>
+    <Application Id="RealmlyCompanion" Executable="RealmlyCompanion.exe"
+                 uap10:RuntimeBehavior="packagedClassicApp" uap10:TrustLevel="mediumIL">
+      <uap:VisualElements DisplayName="Realmly Companion" Description="Bring your adventures home."
+                          Square150x150Logo="Assets\Square150x150Logo.png"
+                          Square44x44Logo="Assets\Square44x44Logo.png" BackgroundColor="#0F0B09" />
+    </Application>
+  </Applications>
+  <Capabilities><rescap:Capability Name="runFullTrust" /></Capabilities>
+</Package>

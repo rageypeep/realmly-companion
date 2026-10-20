@@ -36,7 +36,7 @@ internal sealed class CompanionForm : RealmlyWindow
     private readonly CompanionTray _tray;
     private readonly Button _options = new() { Text = "App options" };
     private readonly System.Windows.Forms.Timer _updateTimer = new() { Interval = 6 * 60 * 60 * 1000 };
-    private bool _exitRequested, _restarting;
+    private bool _exitRequested, _restarting = false;
     private FormWindowState _restoreState = FormWindowState.Normal;
     private readonly ComboBox _installations = new() { DropDownStyle = ComboBoxStyle.DropDownList };
     private readonly Button _manageSetups = new() { Text = "Setups..." };
@@ -98,6 +98,8 @@ internal sealed class CompanionForm : RealmlyWindow
         }
         _status.ForeColor = Color.FromArgb(225, 209, 175);
         foreach (var button in new[] { _connect, _install, _upload, _checkAddon, _companionUpdate, _checkCompanion, _scan, _historyButton, _options }) StyleButton(button);
+        if (CompanionDistribution.UsesMicrosoftStore)
+            _checkCompanion.Text = "App updates: Microsoft Store";
         StyleButton(_manageSetups, compact: true);
         _upload.Text = "Review & upload";
         _recordStatus.ForeColor = Color.FromArgb(225, 209, 175);
@@ -624,6 +626,10 @@ internal sealed class CompanionForm : RealmlyWindow
 
     private async Task UpdateCompanionAsync()
     {
+#if REALMLY_STORE
+        SetStatus("This Companion is updated through Microsoft Store. Open Store > Library to check for app updates.");
+        await Task.CompletedTask;
+#else
         if (_busy || _companionUpdate.Tag is not CompanionRelease offered) return;
         if (MessageBox.Show(this, $"Download Companion {offered.Version}, replace this app and restart it?\n\nYour settings, account connection and addon data will be kept.",
             "Update Realmly Companion", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) != DialogResult.OK) return;
@@ -646,10 +652,18 @@ internal sealed class CompanionForm : RealmlyWindow
             _restarting = true; // Updating must exit, not disappear into the tray and block the helper.
             Close();
         }, DiagnosticOperation.CompanionUpdate);
+#endif
     }
 
     private async Task CheckForCompanionUpdateAsync(bool manual = false)
     {
+        if (CompanionDistribution.UsesMicrosoftStore)
+        {
+            _companionUpdate.Visible = false;
+            _companionUpdate.Tag = null;
+            if (manual) SetStatus("This Companion is updated through Microsoft Store. Open Store > Library to check for app updates.");
+            return; // Never consult the portable update feed from the Store build.
+        }
         try
         {
             var release = await _api.GetLatestReleaseAsync(_lifetime.Token);
@@ -722,7 +736,7 @@ internal sealed class CompanionForm : RealmlyWindow
         if (_persistJournal) SaveSettings();
         if (notifyUpdates && closeToTray)
         {
-            if (_companionUpdate.Tag is CompanionRelease release)
+            if (!CompanionDistribution.UsesMicrosoftStore && _companionUpdate.Tag is CompanionRelease release)
                 _tray.NotifyUpdate("companion:" + release.Version, $"Companion {release.Version} is ready. Open Realmly to review and install it.", true);
             if (_latestAddons.TryGetValue(SelectedClient, out var latest))
             {
@@ -982,7 +996,8 @@ internal sealed class CompanionForm : RealmlyWindow
         panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         for (var row = 0; row < 6; row++) panel.RowStyles.Add(new RowStyle(row == 4 ? SizeType.Percent : SizeType.AutoSize, row == 4 ? 100 : 0));
         var trayOption = new ReadableCheckBox { Name = "closeToTray", Text = "Close / minimize to system tray", AutoSize = true, Checked = _settings.CloseToTray, ForeColor = ForeColor, Margin = new Padding(0, 8, 0, 8) };
-        var notifyOption = new ReadableCheckBox { Name = "notifyUpdates", Text = "Notify me about app and addon updates" + (_settings.CloseToTray ? "" : "\nRequires tray mode"), AutoSize = true, Checked = _settings.NotifyUpdates, Enabled = _settings.CloseToTray, ForeColor = ForeColor, Margin = new Padding(0, 8, 0, 8) };
+        var notificationText = CompanionDistribution.UsesMicrosoftStore ? "Notify me about addon updates" : "Notify me about app and addon updates";
+        var notifyOption = new ReadableCheckBox { Name = "notifyUpdates", Text = notificationText + (_settings.CloseToTray ? "" : "\nRequires tray mode"), AutoSize = true, Checked = _settings.NotifyUpdates, Enabled = _settings.CloseToTray, ForeColor = ForeColor, Margin = new Padding(0, 8, 0, 8) };
         var autoOption = new ReadableCheckBox { Name = "autoUpload", Text = "Auto-upload this setup's saved records", AutoSize = true, AutoCheck = false, Checked = _currentInstallation.AutoUpload, ForeColor = ForeColor, Margin = new Padding(0, 8, 0, 8) };
         var autoFeedback = Copy("Automatic uploads are optional, for this setup only. Posts and addon updates stay manual. Use the tray menu to Open or Exit.");
         autoFeedback.Name = "autoUploadFeedback";
@@ -1011,7 +1026,7 @@ internal sealed class CompanionForm : RealmlyWindow
         void Apply()
         {
             notifyOption.Enabled = trayOption.Checked;
-            notifyOption.Text = "Notify me about app and addon updates" + (trayOption.Checked ? "" : "\nRequires tray mode");
+            notifyOption.Text = notificationText + (trayOption.Checked ? "" : "\nRequires tray mode");
             SetTrayPreferences(trayOption.Checked, notifyOption.Checked);
         }
         trayOption.CheckedChanged += (_, _) => Apply();

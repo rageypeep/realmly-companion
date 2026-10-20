@@ -38,6 +38,13 @@ internal static class Program
     [STAThread]
     private static void Main(string[] args)
     {
+        var payloadArgument = Array.IndexOf(args, "--store-payload");
+        if (payloadArgument >= 0)
+        {
+            if (payloadArgument + 1 >= args.Length) throw new ArgumentException("Pass --store-payload <payload-directory>.");
+            DistributionTests.CheckStorePayload(args[payloadArgument + 1]);
+            return;
+        }
         if (args.Contains("--automatic-only"))
         {
             ApplicationConfiguration.Initialize();
@@ -271,6 +278,7 @@ internal static class Program
         }
         Console.WriteLine("PASS UI states and button bounds; rendered desktop and narrow layouts to " + output);
         TrayTests.Run(output);
+        DistributionTests.Run();
         ThemeTests.Run(form, output);
         SetupDiagnosticsTests.Run(output);
         AutomaticUploadTests.Run(output);

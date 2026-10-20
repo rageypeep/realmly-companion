@@ -7,12 +7,17 @@
     <Nullable>enable</Nullable>
     <Version>0.1.26</Version>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(StoreDistribution)' == 'true'">
+    <DefineConstants>$(DefineConstants);REALMLY_STORE</DefineConstants>
+    <Version>0.2.0</Version>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="UpdaterProbe/**/*.cs" />
     <ProjectReference Include="UpdaterProbe/UpdaterProbe.csproj" ReferenceOutputAssembly="false" />
     <Compile Include="../companion/AddonVersion.cs" Link="AddonVersion.cs" />
     <Compile Include="../companion/WowFiles.cs" Link="WowFiles.cs" />
     <Compile Include="../companion/CompanionForm.cs" Link="CompanionForm.cs" />
+    <Compile Include="../companion/CompanionDistribution.cs" Link="CompanionDistribution.cs" />
     <Compile Include="../companion/RealmlyWindow.cs" Link="RealmlyWindow.cs" />
     <Compile Include="../companion/RealmlyScrollPanel.cs" Link="RealmlyScrollPanel.cs" />
     <Compile Include="../companion/CompanionSettings.cs" Link="CompanionSettings.cs" />

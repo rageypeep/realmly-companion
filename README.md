@@ -12,7 +12,8 @@ your account, ready to turn into chronicles on the website.
 [Report an issue](https://github.com/rageypeep/realmly-companion/issues)
 
 > **Release status:** This repository contains the Companion's 0.1.26 source and
-> regression tests. Current downloads are unsigned testing builds; a signed
+> regression tests, plus a separate 0.2.0 Microsoft Store packaging configuration.
+> Current website downloads are unsigned testing builds; a signed
 > customer release is not available yet.
 
 ## What it does
@@ -159,16 +160,27 @@ The project file embeds the updater helper and application icon; it does not
 reference website source files. Build output, credentials, signing keys and
 personal SavedVariables files are excluded by `.gitignore`.
 
+## Microsoft Store build
+
+The Store flavour is packaged separately as MSIX and uses Microsoft Store for
+Companion updates. It does not check the portable release feed and excludes the
+portable EXE-replacement helper. Addon installation and uploads remain available.
+The portable build and website download are unchanged.
+
+See [Store packaging instructions](packaging/README.md) for the registered package
+identity, build command, tests and pre-submission checklist. Building an unsigned
+submission MSIX does not mean it is approved or signed for customer installation.
+
 ## Code signing policy
 
-Code signing is **not configured yet**. Current downloads are unsigned and Windows
+Standalone code signing is **not configured yet**. Current website downloads are unsigned and Windows
 may display an unknown-publisher or SmartScreen warning.
 
-The intended release process separates unsigned development builds from signed
-customer releases. Version 0.2.0 is the planned customer release, not a currently
-published signed build. Separate update channels still need to be implemented.
+Unsigned development builds keep the existing in-app updater. The separate 0.2.0
+Store flavour relies on Microsoft Store for updates and signing after acceptance.
+It is not a currently published signed customer release.
 
-We intend to investigate SignPath Foundation's open-source signing programme.
+For standalone downloads, we may also investigate SignPath Foundation's open-source signing programme.
 No application approval or signing endorsement is claimed. This section will be
 updated with the actual signing identity and release approval process if accepted.
 
