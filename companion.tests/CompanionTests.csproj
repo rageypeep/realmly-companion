@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Version>0.1.26</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="UpdaterProbe/**/*.cs" />
+    <ProjectReference Include="UpdaterProbe/UpdaterProbe.csproj" ReferenceOutputAssembly="false" />
+    <Compile Include="../companion/AddonVersion.cs" Link="AddonVersion.cs" />
+    <Compile Include="../companion/WowFiles.cs" Link="WowFiles.cs" />
+    <Compile Include="../companion/CompanionForm.cs" Link="CompanionForm.cs" />
+    <Compile Include="../companion/RealmlyWindow.cs" Link="RealmlyWindow.cs" />
+    <Compile Include="../companion/RealmlyScrollPanel.cs" Link="RealmlyScrollPanel.cs" />
+    <Compile Include="../companion/CompanionSettings.cs" Link="CompanionSettings.cs" />
+    <Compile Include="../companion/RealmlyApi.cs" Link="RealmlyApi.cs" />
+    <Compile Include="../companion/UploadPreview.cs" Link="UploadPreview.cs" />
+    <Compile Include="../companion/UploadJournal.cs" Link="UploadJournal.cs" />
+    <Compile Include="../companion/WowProcessDetector.cs" Link="WowProcessDetector.cs" />
+    <Compile Include="../companion/CompanionTray.cs" Link="CompanionTray.cs" />
+    <Compile Include="../companion/DiagnosticReport.cs" Link="DiagnosticReport.cs" />
+    <Compile Include="../companion/AutoUploadPolicy.cs" Link="AutoUploadPolicy.cs" />
+    <Compile Include="../companion/ReadableCheckBox.cs" Link="ReadableCheckBox.cs" />
+    <Compile Include="../companion/RealmlyTextBox.cs" Link="RealmlyTextBox.cs" />
+    <Compile Include="../companion/SelfUpdater.cs" Link="SelfUpdater.cs" />
+    <EmbeddedResource Include="../companion/SelfUpdate.ps1" LogicalName="RealmlyCompanion.SelfUpdate.ps1" />
+    <EmbeddedResource Include="../companion/Assets/realmly-companion.ico" LogicalName="RealmlyCompanion.Icon.ico" />
+  </ItemGroup>
+</Project>

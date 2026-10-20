@@ -11,9 +11,9 @@ your account, ready to turn into chronicles on the website.
 [Get the addon](https://realmly.me/addon) ·
 [Report an issue](https://github.com/rageypeep/realmly-companion/issues)
 
-> **Repository status:** The public Companion repository is being prepared.
-> Source code and build instructions have not been imported yet. Current downloads
-> are unsigned testing builds; a signed customer release is not available yet.
+> **Release status:** This repository contains the Companion's 0.1.26 source and
+> regression tests. Current downloads are unsigned testing builds; a signed
+> customer release is not available yet.
 
 ## What it does
 
@@ -98,6 +98,66 @@ option and accept the confirmation. Watching begins after App options closes.
 
 This repository is for the desktop Companion only. The Realmly website backend,
 database, deployment configuration and service credentials are not included.
+
+## Building from source
+
+Use Windows with the **.NET 8 SDK** installed. Run these commands from the
+repository root:
+
+```powershell
+dotnet build companion/RealmlyCompanion.csproj -c Release
+dotnet run --project companion/RealmlyCompanion.csproj -c Release
+```
+
+The application connects to the live Realmly service. Running a locally built
+Companion does not require access to the private website repository, but account
+pairing and uploads require a Realmly account. Do not approve uploads of personal
+data unless you intend to send it to Realmly.
+
+### Run the tests
+
+```powershell
+dotnet run --project companion.tests/CompanionTests.csproj -c Release -- ./output/companion-review
+```
+
+The default suite uses synthetic character data, temporary directories, injected
+settings and stubbed upload requests. It does not upload real adventures, replace
+your installed Companion or modify your WoW installation. UI checks create their
+own offscreen windows; the updater tests launch disposable probe executables.
+Screenshots are written to the selected output directory.
+
+Add `--live` to also check the versions of published addon packages. This makes
+read-only requests to Realmly; it does not install the downloaded addons.
+
+### Build a portable Windows x64 executable
+
+```powershell
+dotnet publish companion/RealmlyCompanion.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o artifacts/win-x64
+```
+
+The resulting `artifacts/win-x64/RealmlyCompanion.exe` is **unsigned**. Include
+this repository's `LICENSE` when redistributing your build. Building it does not
+create an official release, change the website download or enable a signing service.
+
+For an existing release ZIP, you can additionally verify its advertised SHA-256
+and executable version. Place the release manifest and its matching ZIP in the
+same directory, then run:
+
+```powershell
+dotnet run --project companion.tests/CompanionTests.csproj -c Release -- ./output/companion-review --release ./artifacts/RealmlyCompanion-release.json
+```
+
+### Repository layout
+
+```text
+companion/        Windows application, updater helper, icon and icon-build tool
+companion.tests/  Regression tests and disposable updater probe
+LICENSE           MIT licence
+```
+
+The project file embeds the updater helper and application icon; it does not
+reference website source files. Build output, credentials, signing keys and
+personal SavedVariables files are excluded by `.gitignore`.
 
 ## Code signing policy
 

@@ -1,0 +1,30 @@
+# Generated build, test and release artifacts
+**/bin/
+**/obj/
+**/publish/
+/output/
+/artifacts/
+*.zip
+*.pdb
+
+# Local IDE state
+.vs/
+.idea/
+*.user
+*.suo
+
+# Credentials, signing keys and personal game data must never be committed
+.env
+.env.*
+*.pfx
+*.p12
+*.pem
+*.key
+*.snk
+*.lua
+RealmlyCompanion.json
+upload-history.json
+
+# OS metadata
+Thumbs.db
+.DS_Store
