@@ -12,6 +12,7 @@ internal sealed class CompanionForm : RealmlyWindow
     private readonly Label _account = new();
     private readonly Label _status = new();
     private readonly Label _addonStatus = new();
+    private readonly RealmlyScrollPanel _mainScroll = new();
     private readonly Button _checkAddon = new() { Text = "Check for updates" };
     private readonly Dictionary<ClientKind, AddonVersion> _latestAddons = new();
     private bool _busy;
@@ -45,6 +46,7 @@ internal sealed class CompanionForm : RealmlyWindow
     private readonly DiagnosticLog _diagnostics = new();
     private readonly Action<string> _copyToClipboard;
     private readonly Func<IWin32Window, bool> _confirmAutomaticUploads;
+    private readonly Action<string> _showAddonWarning;
     private int? _previewRecords, _previewCharacters;
     private readonly AutoUploadPolicy _autoPolicy = new();
     private readonly Label _autoStatus = new() { AutoSize = true, MaximumSize = new Size(650, 0), UseMnemonic = false };
@@ -53,13 +55,14 @@ internal sealed class CompanionForm : RealmlyWindow
     private volatile bool _closing;
     private string _selectedSavedPath = "";
 
-    public CompanionForm(CompanionSettings? settings = null, Func<string, ClientKind, WowRunState>? detectWow = null, Action<string>? copyToClipboard = null, RealmlyApi? api = null, Func<IWin32Window, bool>? confirmAutomaticUploads = null)
+    public CompanionForm(CompanionSettings? settings = null, Func<string, ClientKind, WowRunState>? detectWow = null, Action<string>? copyToClipboard = null, RealmlyApi? api = null, Func<IWin32Window, bool>? confirmAutomaticUploads = null, Action<string>? showAddonWarning = null)
     {
         _settings = settings ?? CompanionSettings.Load();
         _api = api ?? new RealmlyApi();
         _currentInstallation = _settings.EnsureInstallation();
         _copyToClipboard = copyToClipboard ?? Clipboard.SetText;
         _confirmAutomaticUploads = confirmAutomaticUploads ?? ConfirmAutomaticUploads;
+        _showAddonWarning = showAddonWarning ?? (message => MessageBox.Show(this, message, "Realmly addon — action needed", MessageBoxButtons.OK, MessageBoxIcon.Warning));
         _detectWow = detectWow ?? (settings is null ? WowProcessDetector.Check : (_, _) => WowRunState.Stopped);
         _persistJournal = settings is null;
         if (_persistJournal)
@@ -84,7 +87,7 @@ internal sealed class CompanionForm : RealmlyWindow
         BackColor = Color.FromArgb(15, 11, 9);
         ForeColor = Color.FromArgb(245, 229, 184);
         Font = new Font("Segoe UI", 10F);
-        _client.Items.AddRange(["WoW Retail tester", "WoW Forever"]);
+        _client.Items.AddRange(["WoW Retail", "WoW Forever"]);
         _client.SelectedIndex = _settings.Client == ClientKind.Forever ? 1 : 0;
         _gameRoot.Text = _settings.GameRoot ?? (settings is null ? WowFiles.FindGameRoot() : null) ?? "";
         _savedVariables.Text = _settings.SavedVariablesPath ?? "";
@@ -108,7 +111,7 @@ internal sealed class CompanionForm : RealmlyWindow
         _upload.BackColor = Color.FromArgb(99, 65, 24);
         _upload.Font = new Font(Font, FontStyle.Bold);
 
-        var scroll = new RealmlyScrollPanel();
+        var scroll = _mainScroll;
         var content = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true,
             AutoSizeMode = AutoSizeMode.GrowAndShrink, Padding = new Padding(24, 18, 24, 18), ColumnCount = 1 };
         content.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
@@ -140,6 +143,11 @@ internal sealed class CompanionForm : RealmlyWindow
         FullRow(upload, 5, _autoStatus);
         FullRow(upload, 6, Actions(_upload, _scan, _historyButton));
         FullRow(upload, 7, _historyStatus);
+        upload.SizeChanged += (_, _) =>
+        {
+            foreach (var label in new[] { _recordStatus, _autoStatus, _historyStatus })
+                label.MaximumSize = new Size(Math.Max(1, upload.ClientSize.Width - upload.Padding.Horizontal - label.Margin.Horizontal), 0);
+        };
         _uploadHints.SetToolTip(_savedVariables, "Choose WTF / Account / ... / SavedVariables / Realmly.lua, not the addon source.");
         _uploadHints.SetToolTip(_recordStatus, "New counts track uploads from this PC only. Website and other-PC uploads are not included. Review & upload shows all characters and dates; Realmly handles duplicates.");
         Add(upload);
@@ -156,7 +164,9 @@ internal sealed class CompanionForm : RealmlyWindow
             CaptureInstallation();
             ActivateInstallation(_settings.ForClient(SelectedClient, _currentInstallation.GameRoot));
             SaveSettings();
-            if (settings is null && Visible && !_busy) await CheckAddonAsync();
+            scroll.ScrollTo(0);
+            try { if (settings is null && Visible && !_busy) await CheckAddonAsync(); }
+            finally { if (!_closing && !IsDisposed) { _client.Focus(); scroll.ScrollTo(0); } }
         };
         _installations.SelectedIndexChanged += async (_, _) =>
         {
@@ -164,7 +174,9 @@ internal sealed class CompanionForm : RealmlyWindow
             CaptureInstallation();
             ActivateInstallation(installation);
             SaveSettings();
-            if (settings is null && Visible && !_busy) await CheckAddonAsync();
+            scroll.ScrollTo(0);
+            try { if (settings is null && Visible && !_busy) await CheckAddonAsync(); }
+            finally { if (!_closing && !IsDisposed) { _installations.Focus(); scroll.ScrollTo(0); } }
         };
         _manageSetups.Click += (_, _) => { if (!_busy) { using var dialog = CreateSetupsDialog(); dialog.ShowDialog(this); } };
         _gameRoot.TextChanged += (_, _) => { if (!_switchingSetup) { DisableAutoForPathChange(); RefreshAddonStatus(); RefreshGameState(); } };
@@ -293,6 +305,7 @@ internal sealed class CompanionForm : RealmlyWindow
     private async Task CheckAddonAsync()
     {
         if (_busy) return;
+        _mainScroll.ScrollTo(0);
         if (!Directory.Exists(_gameRoot.Text)) { SetStatus("Choose your World of Warcraft folder before checking for addon updates."); return; }
         await BusyAsync("Checking the latest addon for " + _client.Text + "...", async cancellationToken =>
         {
@@ -369,7 +382,7 @@ internal sealed class CompanionForm : RealmlyWindow
 
     private async void BrowseFolder(object? sender, EventArgs eventArgs)
     {
-        using var dialog = new FolderBrowserDialog { Description = "Choose the World of Warcraft folder (the folder containing _retail_ or _classic_beta_)" };
+        using var dialog = new FolderBrowserDialog { Description = "Choose the World of Warcraft folder (the folder containing _retail_ or _forever_)" };
         if (dialog.ShowDialog(this) != DialogResult.OK) return;
         _gameRoot.Text = dialog.SelectedPath;
         RefreshSavedVariables(reset: true);
@@ -394,7 +407,14 @@ internal sealed class CompanionForm : RealmlyWindow
 
     private void RefreshSavedVariables(bool reset = false)
     {
-        if (!reset && File.Exists(_savedVariables.Text)) return;
+        _savedVariables.PlaceholderText = Path.Combine(WowFiles.AccountsPath(_gameRoot.Text, SelectedClient), "...", "SavedVariables", "Realmly.lua");
+        var clientPath = reset ? null : WowFiles.ClientSavedVariablesPath(_gameRoot.Text, SelectedClient, _savedVariables.Text);
+        if (clientPath is not null)
+        {
+            if (!string.Equals(clientPath, _savedVariables.Text, StringComparison.OrdinalIgnoreCase)) _savedVariables.Text = clientPath;
+            return;
+        }
+        if (!reset && !string.IsNullOrWhiteSpace(_savedVariables.Text)) return;
         if (!Directory.Exists(_gameRoot.Text)) { if (reset) _savedVariables.Clear(); return; }
         var candidate = WowFiles.PreferredSavedVariablesPath(_gameRoot.Text, SelectedClient);
         if (candidate is not null) _savedVariables.Text = candidate;
@@ -432,12 +452,19 @@ internal sealed class CompanionForm : RealmlyWindow
     private async Task InstallAsync()
     {
         if (_busy) return;
-        if (!Directory.Exists(_gameRoot.Text)) { SetStatus("Choose your World of Warcraft folder first."); return; }
+        if (!Directory.Exists(_gameRoot.Text)) { ShowAddonProblem("Choose your World of Warcraft folder first, then try installing again."); return; }
         try { WowProcessDetector.RequireStopped(RefreshGameState()); }
-        catch (InvalidOperationException error) { _diagnostics.Record(DiagnosticOperation.AddonInstall, error); SetStatus(error.Message); return; }
+        catch (InvalidOperationException error) { _diagnostics.Record(DiagnosticOperation.AddonInstall, error); ShowAddonProblem(error.Message + "\n\nThe addon has not been changed. Exit the game completely, then click Install or update again. /reload is not enough for addon installation."); return; }
         var addOns = WowFiles.AddOnsPath(_gameRoot.Text, SelectedClient);
         var target = Path.Combine(addOns, "Realmly");
-        var installed = WowFiles.InstalledVersion(_gameRoot.Text, SelectedClient);
+        AddonVersion? installed;
+        try { installed = WowFiles.InstalledVersion(_gameRoot.Text, SelectedClient); }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException)
+        {
+            _diagnostics.Record(DiagnosticOperation.AddonInstall, error);
+            ShowAddonProblem("Could not read the installed addon. Check the selected folder and your access permissions.\n\n" + error.Message);
+            return;
+        }
         _latestAddons.TryGetValue(SelectedClient, out var latest);
         var downgrade = installed is not null && latest is not null && installed.Number > latest.Number
             ? "\n\nYour installed version is newer. This will install the older published release." : "";
@@ -454,6 +481,16 @@ internal sealed class CompanionForm : RealmlyWindow
             RefreshAddonStatus();
             SetStatus("Realmly is installed. Start WoW, sign into a character, then log out or type /reload to create Realmly.lua at the shown path.");
         }, DiagnosticOperation.AddonInstall);
+    }
+
+    private void ShowAddonProblem(string message)
+    {
+        if (_closing || IsDisposed || Disposing) return;
+        var explanation = "Addon installation could not complete.\n\n" + message;
+        _addonStatus.Text = explanation;
+        _addonStatus.ForeColor = Color.FromArgb(239, 200, 119);
+        SetStatus(explanation);
+        _showAddonWarning(explanation);
     }
 
     private async Task UploadAsync()
@@ -533,7 +570,9 @@ internal sealed class CompanionForm : RealmlyWindow
             _diagnostics.Record(DiagnosticOperation.Preview, error);
             await UpdatePreviewOnUiAsync(() =>
             {
-                if (!_busy && path == _selectedSavedPath) _recordStatus.Text = "Preview unavailable: " + (error is OperationCanceledException ? "cancelled." : error.Message);
+                if (!_busy && path == _selectedSavedPath) _recordStatus.Text = error is FileNotFoundException or DirectoryNotFoundException
+                    ? "No saved records yet for this client. Log out or /reload, then refresh preview."
+                    : "Preview unavailable: " + (error is OperationCanceledException ? "cancelled." : error.Message);
             });
         }
         finally { _scanning = false; }
@@ -769,6 +808,7 @@ internal sealed class CompanionForm : RealmlyWindow
     private void ActivateInstallation(WowInstallation installation)
     {
         ResetAutoWatch();
+        var previousPath = _savedVariables.Text;
         _switchingSetup = true;
         try
         {
@@ -777,7 +817,12 @@ internal sealed class CompanionForm : RealmlyWindow
             _client.SelectedIndex = installation.Client == ClientKind.Forever ? 1 : 0;
             _gameRoot.Text = installation.GameRoot ?? "";
             _savedVariables.Text = installation.SavedVariablesPath ?? "";
-            if (string.IsNullOrWhiteSpace(_savedVariables.Text)) RefreshSavedVariables();
+            if (string.IsNullOrWhiteSpace(_savedVariables.Text))
+                _savedVariables.Text = WowFiles.ClientSavedVariablesPath(_gameRoot.Text, installation.Client, previousPath) ?? "";
+            RefreshSavedVariables();
+            // A repaired setup must not silently upload a different file under old consent.
+            if (!string.Equals(installation.SavedVariablesPath ?? "", _savedVariables.Text, StringComparison.OrdinalIgnoreCase))
+                installation.AutoUpload = false;
             _fileStamp = null;
             _previewRecords = _previewCharacters = null;
             _recordStatus.Text = "Refresh preview to inspect this setup.";
@@ -1071,6 +1116,10 @@ internal sealed class CompanionForm : RealmlyWindow
     {
         if (_busy || _closing || IsDisposed || Disposing) return;
         _busy = true;
+        var previousFocus = ActiveControl;
+        var followFocus = _mainScroll.FollowFocus;
+        _mainScroll.FollowFocus = false; // Disabling the focused control must not scroll to the next enabled one.
+        if (operation == DiagnosticOperation.AddonCheck) _mainScroll.ScrollTo(0);
         try
         {
             SetStatus(message);
@@ -1085,7 +1134,13 @@ internal sealed class CompanionForm : RealmlyWindow
         catch (Exception error)
         {
             _diagnostics.Record(operation, error);
-            if (!_closing && !IsDisposed && !Disposing) SetStatus(error is OperationCanceledException ? "Operation cancelled." : error.Message);
+            if (!_closing && !IsDisposed && !Disposing)
+            {
+                var explanation = error is OperationCanceledException ? "Operation cancelled." : error.Message;
+                if (operation == DiagnosticOperation.AddonInstall && error is not OperationCanceledException)
+                    ShowAddonProblem(explanation);
+                else SetStatus(explanation);
+            }
         }
         finally
         {
@@ -1099,7 +1154,10 @@ internal sealed class CompanionForm : RealmlyWindow
                 _client.Enabled = _gameRoot.Enabled = _savedVariables.Enabled = _installations.Enabled = _manageSetups.Enabled = true;
                 foreach (var browse in Controls.Find("browse", true)) browse.Enabled = true;
                 RefreshAccount();
+                if (previousFocus is { IsDisposed: false, CanFocus: true }) previousFocus.Focus();
+                if (operation == DiagnosticOperation.AddonCheck) _mainScroll.ScrollTo(0);
             }
+            _mainScroll.FollowFocus = followFocus;
         }
     }
 

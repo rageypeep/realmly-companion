@@ -9,15 +9,15 @@
     <ApplicationIcon>Assets/realmly-companion.ico</ApplicationIcon>
     <AssemblyName>RealmlyCompanion</AssemblyName>
     <RootNamespace>RealmlyCompanion</RootNamespace>
-    <Version>0.1.26</Version>
-    <AssemblyVersion>0.1.26.0</AssemblyVersion>
-    <FileVersion>0.1.26.0</FileVersion>
+    <Version>0.1.32</Version>
+    <AssemblyVersion>0.1.32.0</AssemblyVersion>
+    <FileVersion>0.1.32.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(StoreDistribution)' == 'true'">
     <DefineConstants>$(DefineConstants);REALMLY_STORE</DefineConstants>
-    <Version>0.2.0</Version>
-    <AssemblyVersion>0.2.0.0</AssemblyVersion>
-    <FileVersion>0.2.0.0</FileVersion>
+    <Version>0.2.6</Version>
+    <AssemblyVersion>0.2.6.0</AssemblyVersion>
+    <FileVersion>0.2.6.0</FileVersion>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="SelfUpdater.cs" Condition="'$(StoreDistribution)' == 'true'" />

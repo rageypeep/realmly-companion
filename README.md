@@ -7,18 +7,18 @@ field notes to [Realmly](https://realmly.me), a social home for your WoW charact
 Keep the Realmly addon current, review your saved adventures and upload them to
 your account, ready to turn into chronicles on the website.
 
-[Download the Companion](https://realmly.me/companion) ·
+[Download the Companion](https://realmly.me/download) ·
 [Get the addon](https://realmly.me/addon) ·
 [Report an issue](https://github.com/rageypeep/realmly-companion/issues)
 
-> **Release status:** This repository contains the Companion's 0.1.26 source and
-> regression tests, plus a separate 0.2.0 Microsoft Store packaging configuration.
-> Current website downloads are unsigned testing builds; a signed
+> **Release status:** This repository contains the Companion's 0.1.32 source and
+> regression tests, plus a separate 0.2.6 Microsoft Store packaging configuration.
+> Current website downloads are unsigned portable builds; a signed
 > customer release is not available yet.
 
 ## What it does
 
-- **Install and update the addon** for WoW Forever or the Retail testing client.
+- **Install and update the addon** for WoW Forever or Retail.
   The app checks installed versions and blocks addon replacement while the
   selected game client is running or its status cannot be verified.
 - **Find your field notes** by locating the addon's `Realmly.lua` SavedVariables file.
@@ -39,7 +39,7 @@ social posts automatically; creating and publishing chronicles happens on Realml
 ## Getting started
 
 1. Download the Windows x64 ZIP from the
-   [official Companion page](https://realmly.me/companion).
+   [official Companion page](https://realmly.me/download).
 2. Extract it into a folder you can write to, then run `RealmlyCompanion.exe`.
    Keep the app in a writable location so its self-updater can replace it.
 3. Choose your game client and World of Warcraft folder.
@@ -176,7 +176,7 @@ submission MSIX does not mean it is approved or signed for customer installation
 Standalone code signing is **not configured yet**. Current website downloads are unsigned and Windows
 may display an unknown-publisher or SmartScreen warning.
 
-Unsigned development builds keep the existing in-app updater. The separate 0.2.0
+Unsigned development builds keep the existing in-app updater. The separate 0.2.6
 Store flavour relies on Microsoft Store for updates and signing after acceptance.
 It is not a currently published signed customer release.
 

@@ -16,6 +16,32 @@ internal static class SetupDiagnosticsTests
     {
         const string secret = "PRIVATE_MARKER_12345";
         var root = Path.Combine(Path.GetTempPath(), "realmly-setups-" + Guid.NewGuid().ToString("N"), secret);
+        var retailLua = Path.Combine(root, "_retail_", "WTF", "Account", "SAME_ACCOUNT", "SavedVariables", "Realmly.lua");
+        var foreverLua = Path.Combine(root, "_forever_", "WTF", "Account", "SAME_ACCOUNT", "SavedVariables", "Realmly.lua");
+        var betaLua = Path.Combine(root, "_classic_beta_", "WTF", "Account", "SAME_ACCOUNT", "SavedVariables", "Realmly.lua");
+        Directory.CreateDirectory(Path.GetDirectoryName(retailLua)!);
+        Directory.CreateDirectory(Path.GetDirectoryName(betaLua)!);
+        File.WriteAllText(retailLua, "-- old Retail file still exists");
+        File.WriteAllText(betaLua, "-- old Classic beta file still exists");
+        Assert(!File.Exists(foreverLua), "Forever target fixture must not exist yet");
+        Assert(WowFiles.ClientSavedVariablesPath(root, ClientKind.Forever, retailLua) == foreverLua, "Retail to Forever must preserve account");
+        Assert(WowFiles.ClientSavedVariablesPath(root, ClientKind.Forever, betaLua) == foreverLua, "Old Classic beta path must be repaired");
+        Assert(WowFiles.ClientSavedVariablesPath(root, ClientKind.Retail, foreverLua) == retailLua, "Forever to Retail path");
+        Assert(WowFiles.ClientSavedVariablesPath(root, ClientKind.Forever, Path.Combine(root, "backups", "Realmly.lua")) is null, "Custom backup path must not be rewritten");
+        Assert(WowFiles.ClientSavedVariablesPath(root, ClientKind.Forever, Path.Combine(root, "..", "other", "_retail_", "WTF", "Account", "OTHER", "SavedVariables", "Realmly.lua")) is null, "Other installation must not be rewritten");
+        var pathSettings = new CompanionSettings { GameRoot = root, SavedVariablesPath = retailLua };
+        using (var switchingForm = new CompanionForm(pathSettings))
+        {
+            Field<ComboBox>(switchingForm, "_client").SelectedIndex = 1;
+            Assert(Field<TextBox>(switchingForm, "_savedVariables").Text == foreverLua, "Client picker must switch displayed Lua path before target file exists");
+            Field<ComboBox>(switchingForm, "_client").SelectedIndex = 0;
+            Assert(Field<TextBox>(switchingForm, "_savedVariables").Text == retailLua, "Switching back must restore Retail file");
+            var stale = pathSettings.ForClient(ClientKind.Forever, root);
+            stale.SavedVariablesPath = betaLua; stale.AutoUpload = true;
+            Field<ComboBox>(switchingForm, "_client").SelectedIndex = 1;
+            Assert(Field<TextBox>(switchingForm, "_savedVariables").Text == foreverLua && !stale.AutoUpload, "Stale setup must be corrected without carrying auto-upload consent");
+            Assert(stale.SavedVariablesPath == foreverLua, "Corrected path must be remembered for the selected setup");
+        }
         var legacy = new CompanionSettings { GameRoot = root, SavedVariablesPath = Path.Combine(root, "personal", "Realmly.lua"), Client = ClientKind.Retail, ProtectedAccessToken = secret };
         var retail = legacy.EnsureInstallation();
         Assert(retail.GameRoot == root && retail.SavedVariablesPath == legacy.SavedVariablesPath && legacy.Installations.Count == 1, "Legacy migration lost paths");
@@ -57,12 +83,39 @@ internal static class SetupDiagnosticsTests
         var clients = Field<ComboBox>(form, "_client");
         var roots = Field<TextBox>(form, "_gameRoot");
         var files = Field<TextBox>(form, "_savedVariables");
+        var scroll = Field<RealmlyScrollPanel>(form, "_mainScroll");
+        scroll.ScrollTo(scroll.MaximumOffset);
         clients.SelectedIndex = 1;
+        Assert(scroll.Offset == 0, "Changing client must return to the top");
         Assert(roots.Text == forever.GameRoot && files.Text == forever.SavedVariablesPath, "Retail to Forever UI path restore");
         clients.SelectedIndex = 0;
         Assert(roots.Text == second.GameRoot && files.Text == second.SavedVariablesPath, "Forever to Retail UI path restore");
         Field<ComboBox>(form, "_installations").SelectedItem = retail;
         Assert(roots.Text == retail.GameRoot && files.Text == retail.SavedVariablesPath, "Switching between two Retail installations");
+        clients.Focus(); scroll.ScrollTo(scroll.MaximumOffset);
+        var finishCheck = new TaskCompletionSource();
+        var busyCheck = (Task)Call(form, "BusyAsync", "Checking fixture",
+            (Func<CancellationToken, Task>)(_ => finishCheck.Task), DiagnosticOperation.AddonCheck)!;
+        Application.DoEvents();
+        Assert(scroll.Offset == 0 && !scroll.FollowFocus, "Disabling focused setup controls must not scroll down");
+        scroll.ScrollTo(scroll.MaximumOffset);
+        finishCheck.SetResult();
+        var deadline = DateTime.UtcNow.AddSeconds(5);
+        while (!busyCheck.IsCompleted && DateTime.UtcNow < deadline) { Application.DoEvents(); Thread.Sleep(5); }
+        busyCheck.GetAwaiter().GetResult();
+        Assert(scroll.Offset == 0 && scroll.FollowFocus, "Finishing an addon check must preserve the top and restore normal focus scrolling");
+        scroll.ScrollTo(scroll.MaximumOffset);
+        var failedCheck = (Task)Call(form, "BusyAsync", "Offline fixture",
+            (Func<CancellationToken, Task>)(_ => Task.FromException(new IOException("Offline fixture"))), DiagnosticOperation.AddonCheck)!;
+        failedCheck.GetAwaiter().GetResult();
+        Assert(scroll.Offset == 0 && scroll.FollowFocus, "Failed addon check must return to the top too");
+        var previewCheck = (Task)Call(form, "RefreshPreviewAsync", true)!;
+        deadline = DateTime.UtcNow.AddSeconds(5);
+        while (!previewCheck.IsCompleted && DateTime.UtcNow < deadline) { Application.DoEvents(); Thread.Sleep(5); }
+        previewCheck.GetAwaiter().GetResult();
+        var previewStatus = Field<Label>(form, "_recordStatus");
+        Assert(previewStatus.Text.Contains("No saved records yet") && !previewStatus.Text.Contains(root), "Missing-file message should not repeat the long path");
+        Assert(previewStatus.MaximumSize.Width == previewStatus.Parent!.ClientSize.Width - previewStatus.Parent.Padding.Horizontal - previewStatus.Margin.Horizontal, "Preview status must use full panel width");
         Field<DiagnosticLog>(form, "_diagnostics").Record(DiagnosticOperation.Upload, new InvalidOperationException(secret));
         using (var diagnostics = (Form)Call(form, "CreateDiagnosticsDialog")!)
         {

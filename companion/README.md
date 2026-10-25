@@ -1,5 +1,52 @@
 # Realmly Companion for Windows
 
+## 0.1.32 / Store 0.2.6: Retail branding
+
+The game-client selector now says WoW Retail. Retail addon checks use the current
+RealmlyRetail-addon.zip download; legacy addon version parsing remains supported.
+Diagnostic reports show the numeric addon version without the old test suffix.
+Existing named setups, game paths, sign-in and upload preferences are preserved.
+
+## 0.1.31 / Store 0.2.5: addon checks return to the top
+
+The addon Check for updates action scrolls to the top when starting and after
+success or failure, including when focus is restored after the check. Other
+operations retain their existing scroll behaviour.
+
+## 0.1.30 / Store 0.2.4: stable setup switching and clearer previews
+
+Changing game client or saved setup returns the view to the top, including after
+its automatic addon check. Busy operations suppress focus-driven scroll jumps
+while disabling/re-enabling controls and restore the original control's focus.
+Upload status text uses the panel's available width. Missing SavedVariables now
+shows concise logout/reload guidance instead of repeating a long file path.
+
+## 0.1.29 / Store 0.2.3: client-aware Realmly.lua paths
+
+Switching clients retargets standard SavedVariables paths under the selected WoW
+root to `_forever_` or `_retail_`, preserving the account folder. Old Classic
+beta paths are corrected too, even if that old file still exists. A target need
+not exist yet: log out or /reload in the selected client to write it.
+Explicit custom/backup paths and each client's remembered account stay separate.
+Automatic uploads are disabled when repairing a setup's selected file.
+
+## 0.1.28 / Store 0.2.2: visible addon-install feedback
+
+Blocked addon installs and installation failures now display a warning popup
+and an explanation beside the addon buttons, not only the lower status area.
+Running/unknown WoW state, missing folders, unreadable addon versions and
+download/install errors are covered. WoW must be fully closed for addon updates;
+`/reload` only flushes records and does not release the running client.
+
+## 0.1.27 / Store 0.2.1: correct WoW Forever folder
+
+WoW Forever now uses `_forever_` for addon installation, installed-version checks,
+SavedVariables discovery and running-client detection. Retail still uses
+`_retail_`. Classic beta folders are no longer treated as Forever.
+Existing game files and saved records are not moved or deleted.
+If your saved setup points to a Classic beta Realmly.lua, use Browse to select
+the file under `_forever_/WTF/Account/<account>/SavedVariables/Realmly.lua`.
+
 The Companion is a small WinForms application for Windows 10/11. It can:
 
 - install or update the correct Realmly Add-on ZIP into a selected WoW client;

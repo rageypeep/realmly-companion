@@ -39,7 +39,7 @@ internal sealed record DiagnosticSnapshot(ClientKind Client, AddonVersion? Insta
 internal static class DiagnosticReport
 {
     private static string YesNo(bool value) => value ? "yes" : "no";
-    private static string SafeVersion(AddonVersion? version) => version is null ? "not available" : version.Number.ToString() + (version.Display.EndsWith("-retail-test", StringComparison.Ordinal) ? "-retail-test" : "");
+    private static string SafeVersion(AddonVersion? version) => version?.Number.ToString() ?? "not available";
     public static string Build(DiagnosticSnapshot snapshot, DiagnosticLog log)
     {
         var lines = new List<string>

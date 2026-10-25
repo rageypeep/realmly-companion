@@ -18,10 +18,11 @@ internal static class TrayTests
         var root = Path.Combine(Path.GetTempPath(), "realmly-tray-test-" + Guid.NewGuid().ToString("N"));
         Assert(WowProcessDetector.Evaluate(root, ClientKind.Retail, []) == WowRunState.Stopped, "Empty process list");
         var retail = Path.Combine(root, "_retail_", "Wow.exe");
-        var forever = Path.Combine(root, "_classic_beta_", "Wow.exe");
+        var forever = Path.Combine(root, "_forever_", "Wow.exe");
         Assert(WowProcessDetector.Evaluate(root, ClientKind.Retail, [retail]) == WowRunState.Running, "Retail detection");
         Assert(WowProcessDetector.Evaluate(root, ClientKind.Forever, [retail]) == WowRunState.Stopped, "Other client blocked");
         Assert(WowProcessDetector.Evaluate(root, ClientKind.Forever, [forever]) == WowRunState.Running, "Forever detection");
+        Assert(WowProcessDetector.Evaluate(root, ClientKind.Forever, [Path.Combine(root, "_classic_beta_", "Wow.exe")]) == WowRunState.Stopped, "Classic beta is not Forever");
         Assert(WowProcessDetector.Evaluate(root, ClientKind.Retail, [Path.Combine(root, "_retail_-copy", "Wow.exe")]) == WowRunState.Stopped, "Adjacent install path prefix");
         Assert(WowProcessDetector.Evaluate(root, ClientKind.Retail, [null]) == WowRunState.Unknown, "Unreadable running client assumed closed");
         Assert(WowProcessDetector.Evaluate(root, ClientKind.Retail, [null, retail]) == WowRunState.Running, "Known selected game should take precedence");
@@ -46,7 +47,8 @@ internal static class TrayTests
         Assert(WowFiles.InstalledVersion(root, ClientKind.Retail)!.Display == "0.8.0", "Late process guard damaged old addon");
 
         var preferences = new CompanionSettings { GameRoot = root, CloseToTray = true, NotifyUpdates = true };
-        using var form = new CompanionForm(preferences, (_, _) => WowRunState.Running);
+        var addonWarnings = new List<string>();
+        using var form = new CompanionForm(preferences, (_, _) => WowRunState.Running, showAddonWarning: addonWarnings.Add);
         ShowOffscreen(form);
         using (var running = new Bitmap(form.Width, form.Height))
         {
@@ -57,6 +59,24 @@ internal static class TrayTests
         Assert(status.Text.Contains("WoW running") && status.Text.Contains("/reload"), "Game status / saved-record guidance missing");
         var blockedInstall = (Task)Call(form, "InstallAsync")!;
         Assert(blockedInstall.IsCompleted, "Install reached a dialog or network while WoW running");
+        Assert(addonWarnings.Count == 1 && addonWarnings[0].Contains("Exit the game completely"), "Running game must show an actionable warning popup");
+        var addonStatus = (Label)typeof(CompanionForm).GetField("_addonStatus", Private)!.GetValue(form)!;
+        Assert(addonStatus.Text.Contains("/reload is not enough"), "Blocked install explanation missing beside addon buttons");
+        var failedInstall = (Task)Call(form, "BusyAsync", "Installing test addon",
+            (Func<CancellationToken, Task>)(_ => Task.FromException(new IOException("Download failed: fixture"))), DiagnosticOperation.AddonInstall)!;
+        Assert(failedInstall.IsCompleted && addonWarnings.Count == 2 && addonWarnings[1].Contains("Download failed"), "Install failure must show a popup");
+        Assert(addonStatus.Text.Contains("Download failed"), "Install failure missing beside addon buttons");
+        Assert(!Directory.Exists(Path.Combine(root, "missing")), "Missing-folder fixture must not exist");
+        using (var missing = new CompanionForm(new CompanionSettings { GameRoot = Path.Combine(root, "missing") }, showAddonWarning: addonWarnings.Add))
+        {
+            var missingInstall = (Task)Call(missing, "InstallAsync")!;
+            Assert(missingInstall.IsCompleted && addonWarnings.Count == 3 && addonWarnings[2].Contains("Choose your World of Warcraft folder"), "Missing folder must explain why install did not start");
+        }
+        using (var unknown = new CompanionForm(new CompanionSettings { GameRoot = root }, (_, _) => WowRunState.Unknown, showAddonWarning: addonWarnings.Add))
+        {
+            var unknownInstall = (Task)Call(unknown, "InstallAsync")!;
+            Assert(unknownInstall.IsCompleted && addonWarnings.Count == 4 && addonWarnings[3].Contains("Cannot verify"), "Unknown game state must explain why install is blocked");
+        }
         using (var preview = (Form)Call(form, "CreateUploadDialog", UploadPreview.Parse(UploadTests.Source, []))!)
             Assert(preview.Controls.Cast<Control>().SelectMany(Descendants).OfType<TextBox>().Any(text => text.Text.Contains("Only data already saved to disk")), "Running-game preview warning missing");
 

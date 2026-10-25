@@ -9,6 +9,7 @@ internal sealed class RealmlyScrollPanel : Panel
     private Control? _content;
     private bool _arranging;
     internal int Offset { get; private set; }
+    internal bool FollowFocus { get; set; } = true;
     internal int MaximumOffset => Math.Max(0, (_content?.Height ?? 0) - _viewport.Height);
     internal int ContentWidth => _content?.Width ?? 0;
     internal int ViewportWidth => _viewport.Width;
@@ -44,7 +45,7 @@ internal sealed class RealmlyScrollPanel : Panel
 
     private void EnsureVisible(Control control)
     {
-        if (_arranging || !control.IsHandleCreated || _viewport.Height <= 0 || FindForm()?.Visible != true) return;
+        if (!FollowFocus || _arranging || !control.IsHandleCreated || _viewport.Height <= 0 || FindForm()?.Visible != true) return;
         var top = _viewport.PointToClient(control.PointToScreen(Point.Empty)).Y;
         if (top < 0) ScrollTo(Offset + top);
         else if (top + control.Height > _viewport.Height) ScrollTo(Offset + top + control.Height - _viewport.Height);

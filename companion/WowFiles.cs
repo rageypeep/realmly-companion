@@ -6,7 +6,7 @@ internal enum ClientKind { Retail, Forever }
 
 internal static class WowFiles
 {
-    public static string ClientFolder(ClientKind client) => client == ClientKind.Retail ? "_retail_" : "_classic_beta_";
+    public static string ClientFolder(ClientKind client) => client == ClientKind.Retail ? "_retail_" : "_forever_";
 
     public static string AddOnsPath(string gameRoot, ClientKind client) => Path.Combine(gameRoot, ClientFolder(client), "Interface", "AddOns");
 
@@ -45,6 +45,26 @@ internal static class WowFiles
 
     public static string AccountsPath(string gameRoot, ClientKind client) => Path.Combine(gameRoot, ClientFolder(client), "WTF", "Account");
 
+    // Retarget only standard SavedVariables paths inside this WoW installation.
+    // Keep the account selection even before the new client has written its file.
+    internal static string? ClientSavedVariablesPath(string gameRoot, ClientKind client, string? selectedPath)
+    {
+        if (string.IsNullOrWhiteSpace(gameRoot) || string.IsNullOrWhiteSpace(selectedPath)) return null;
+        try
+        {
+            var parts = Path.GetRelativePath(Path.GetFullPath(gameRoot), Path.GetFullPath(selectedPath))
+                .Split([Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar], StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length != 6
+                || !new[] { "_retail_", "_classic_beta_", "_forever_" }.Contains(parts[0], StringComparer.OrdinalIgnoreCase)
+                || !string.Equals(parts[1], "WTF", StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(parts[2], "Account", StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(parts[4], "SavedVariables", StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(parts[5], "Realmly.lua", StringComparison.OrdinalIgnoreCase)) return null;
+            return Path.Combine(AccountsPath(gameRoot, client), parts[3], "SavedVariables", "Realmly.lua");
+        }
+        catch (Exception error) when (error is ArgumentException or NotSupportedException or PathTooLongException) { return null; }
+    }
+
     public static string TocPath(string gameRoot, ClientKind client) => Path.Combine(AddOnsPath(gameRoot, client), "Realmly", "Realmly.toc");
 
     public static AddonVersion? InstalledVersion(string gameRoot, ClientKind client)
@@ -55,7 +75,7 @@ internal static class WowFiles
 
     private static async Task<byte[]> DownloadAddonAsync(ClientKind client, CancellationToken cancellationToken, int timeoutSeconds = 60)
     {
-        var name = client == ClientKind.Retail ? "RealmlyRetail-tester.zip" : "Realmly-addon.zip";
+        var name = client == ClientKind.Retail ? "RealmlyRetail-addon.zip" : "Realmly-addon.zip";
         using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(timeoutSeconds) };
         return await http.GetByteArrayAsync($"https://realmly.me/downloads/{name}?check={DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}", cancellationToken);
     }

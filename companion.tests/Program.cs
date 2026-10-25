@@ -81,6 +81,10 @@ internal static class Program
         }
         var root = Path.Combine(Path.GetTempPath(), "realmly-tests-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(root);
+        Assert(WowFiles.ClientFolder(ClientKind.Forever) == "_forever_", "Forever folder must not target Classic beta");
+        Assert(WowFiles.ClientFolder(ClientKind.Retail) == "_retail_", "Retail folder unchanged");
+        Assert(WowFiles.AddOnsPath(root, ClientKind.Forever) == Path.Combine(root, "_forever_", "Interface", "AddOns"), "Forever addon destination");
+        Assert(WowFiles.AccountsPath(root, ClientKind.Forever) == Path.Combine(root, "_forever_", "WTF", "Account"), "Forever records destination");
         foreach (var client in new[] { ClientKind.Retail, ClientKind.Forever })
         {
             Assert(WowFiles.InstalledVersion(root, client) is null, "Absent addon");
@@ -91,6 +95,7 @@ internal static class Program
             var saved = Path.Combine(WowFiles.AccountsPath(root, client), "TEST", "SavedVariables", "Realmly.lua");
             Directory.CreateDirectory(Path.GetDirectoryName(saved)!);
             File.WriteAllText(saved, "saved variables untouched");
+            Assert(WowFiles.SavedVariablesCandidates(root, client).Contains(saved), "Selected client's records are discoverable");
             Assert(WowFiles.InstalledVersion(root, client)?.Number < new Version(0, 8, 3, 0), "Outdated addon");
             try
             {
@@ -104,6 +109,7 @@ internal static class Program
             Assert(!File.Exists(Path.Combine(directory, "old.lua")), "Old addon not replaced");
             Assert(File.ReadAllText(saved) == "saved variables untouched", "SavedVariables changed");
         }
+        Assert(!Directory.Exists(Path.Combine(root, "_classic_beta_")), "Install must never create a Classic beta folder");
         Console.WriteLine("PASS version parsing, independent clients, staged installation, unsafe ZIP rejection and SavedVariables preservation");
         if (args.Contains("--live"))
         {
