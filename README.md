@@ -11,8 +11,8 @@ your account, ready to turn into chronicles on the website.
 [Get the addon](https://realmly.me/addon) ·
 [Report an issue](https://github.com/rageypeep/realmly-companion/issues)
 
-> **Release status:** This repository contains the Companion's 0.1.32 source and
-> regression tests, plus a separate 0.2.6 Microsoft Store packaging configuration.
+> **Release status:** This repository contains the Companion's 0.1.33 source and
+> regression tests, plus a separate 0.2.7 Microsoft Store packaging configuration.
 > Current website downloads are unsigned portable builds; a signed
 > customer release is not available yet.
 
@@ -176,7 +176,7 @@ submission MSIX does not mean it is approved or signed for customer installation
 Standalone code signing is **not configured yet**. Current website downloads are unsigned and Windows
 may display an unknown-publisher or SmartScreen warning.
 
-Unsigned development builds keep the existing in-app updater. The separate 0.2.6
+Unsigned development builds keep the existing in-app updater. The separate 0.2.7
 Store flavour relies on Microsoft Store for updates and signing after acceptance.
 It is not a currently published signed customer release.
 

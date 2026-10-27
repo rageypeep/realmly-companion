@@ -54,6 +54,22 @@ internal static class UploadTests
             try { UploadPreview.Parse(bad, []); throw new Exception("Malformed/executable file accepted"); }
             catch (InvalidOperationException) { }
         }
+        // A realistic accumulated history remains well below the byte limit,
+        // yet nested scope/metadata tables exceed the old 60,000-field ceiling.
+        var records = string.Join(",", Enumerable.Range(1, 3000).Select(index =>
+            "{id=\"record-" + index + "\",capturedAt=\"2026-10-27T12:00:00Z\",name=\"Herb\",zone=\"Forest\",scopes={{mapId=50,x=0.5,y=0.5}}," +
+            string.Join(",", Enumerable.Range(1, 16).Select(field => "metadata" + field + "=1")) + "}"));
+        var largeHistory = "RealmlyDB={profiles={Test={adventurerId=\"retail-history\",character={name=\"Test\",realm=\"Realm\"},locations={" + records + "}}}}";
+        var grownPreview = UploadPreview.Parse(largeHistory, []);
+        Assert(grownPreview.Records == 3000 && grownPreview.NewRecords == 3000, "A valid growing history was mistaken for an invalid file");
+        var largeAgain = UploadPreview.Parse(largeHistory, grownPreview.RecordKeys);
+        Assert(largeAgain.Records == 3000 && largeAgain.NewRecords == 0, "Large-history deduplication changed");
+        try {
+            new SavedVariablesReader("RealmlyDB={extra={" + string.Join(",", Enumerable.Repeat("1", 250001)) + "}}").Read();
+            throw new Exception("Unbounded SavedVariables complexity accepted");
+        } catch (InvalidOperationException error) {
+            Assert(error.Message.Contains("complexity limit"), "Complexity limit still reports a valid file as addon source");
+        }
         Console.WriteLine("PASS safe SavedVariables preview, characters/dates, per-adventurer IDs, local deltas, duplicate/failure history and persistence");
     }
 

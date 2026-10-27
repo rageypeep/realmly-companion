@@ -56,6 +56,7 @@ internal sealed record UploadPreview(string Source, string Hash, string[] Record
 internal sealed class SavedVariablesReader(string source)
 {
     private readonly string _source = source.TrimStart('\uFEFF');
+    private const int MaximumTableFields = 250_000;
     private int _index, _entries;
     public Dictionary<string, object?> Read()
     {
@@ -102,7 +103,8 @@ internal sealed class SavedVariablesReader(string source)
             while (true)
             {
                 Skip(); if (Consume('}')) return result;
-                if (++_entries > 60000) Fail();
+                if (++_entries > MaximumTableFields)
+                    throw new InvalidOperationException("This SavedVariables file exceeds the preview complexity limit (250,000 table fields).");
                 string? key = null;
                 if (Consume('[')) { key = Convert.ToString(Value(depth + 1), CultureInfo.InvariantCulture); Expect(']'); Expect('='); }
                 else if (char.IsAsciiLetter(Current) || Current == '_')

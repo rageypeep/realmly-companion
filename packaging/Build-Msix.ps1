@@ -4,7 +4,7 @@ param(
     [string]$PublisherDisplayName,
     [string]$DisplayName = 'Realmly Companion',
     [string]$IdentityFile = (Join-Path $PSScriptRoot 'StoreIdentity.json'),
-    [version]$Version = '0.2.6.0',
+    [version]$Version = '0.2.7.0',
     [string]$MakeAppxPath,
     [switch]$ValidationOnly
 )

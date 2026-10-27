@@ -1,5 +1,13 @@
 # Realmly Companion for Windows
 
+## 0.1.33 / Store 0.2.7: Growing SavedVariables histories
+
+Valid histories with more than 60,000 nested table fields now preview normally.
+The data-only reader allows up to 250,000 fields while retaining the 2 MB byte
+limit, nesting bound and executable-Lua rejection. Exceeding the complexity
+limit now explains the actual problem instead of claiming the file is addon source.
+Existing records, settings and local upload history are preserved.
+
 ## 0.1.32 / Store 0.2.6: Retail branding
 
 The game-client selector now says WoW Retail. Retail addon checks use the current
