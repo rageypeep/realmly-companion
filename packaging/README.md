@@ -1,5 +1,8 @@
 # Microsoft Store package
 
+[Store patch notes and combined submission text](STORE-CHANGELOG.md) are kept separately
+from portable releases. Use them to combine changes when skipping Store builds.
+
 This creates a self-contained Windows x64 MSIX of the existing WinForms app.
 The Store flavour is **0.2.7**, requires Windows 10 build 19041 or later, and uses
 Microsoft Store for Companion updates. Portable development builds remain 0.1.33

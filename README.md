@@ -11,6 +11,9 @@ your account, ready to turn into chronicles on the website.
 [Get the addon](https://realmly.me/addon) ·
 [Report an issue](https://github.com/rageypeep/realmly-companion/issues)
 
+[Microsoft Store patch notes](packaging/STORE-CHANGELOG.md) include individual build
+changes and combined text for Store submissions.
+
 > **Release status:** This repository contains the Companion's 0.1.33 source and
 > regression tests, plus a separate 0.2.7 Microsoft Store packaging configuration.
 > Current website downloads are unsigned portable builds; a signed
