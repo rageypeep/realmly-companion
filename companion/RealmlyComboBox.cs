@@ -6,13 +6,31 @@ namespace RealmlyCompanion;
 internal sealed class RealmlyComboBox : ComboBox
 {
     private bool _hover;
+    private readonly ToolTip _fullText = new() { InitialDelay = 400, AutoPopDelay = 15000 };
     internal RealmlyComboBox()
     {
         DropDownStyle = ComboBoxStyle.DropDownList;
         DrawMode = DrawMode.OwnerDrawFixed;
+        AutoSize = true;
         BackColor = Color.FromArgb(25, 18, 12);
         ForeColor = Color.FromArgb(239, 215, 164);
         IntegralHeight = false;
+    }
+    public override Size GetPreferredSize(Size proposedSize)
+    {
+        var preferred = base.GetPreferredSize(proposedSize);
+        // Owner-drawn native combos include selection-frame padding that the
+        // cached PreferredHeight can omit after font/DPI scaling. Reserve it in
+        // the table row so the actual native control never extends outside it.
+        return new Size(preferred.Width, Math.Max(preferred.Height, ItemHeight + Math.Max(6, 6 * DeviceDpi / 96)));
+    }
+    private void FitDropDown()
+    {
+        var width = Width;
+        foreach (var item in Items)
+            width = Math.Max(width, TextRenderer.MeasureText(GetItemText(item), Font, Size.Empty,
+                TextFormatFlags.SingleLine | TextFormatFlags.NoPrefix).Width + SystemInformation.VerticalScrollBarWidth + 20 * DeviceDpi / 96);
+        DropDownWidth = Math.Min(width, Math.Max(1, Screen.FromControl(this).WorkingArea.Width - 24 * DeviceDpi / 96));
     }
     protected override void OnDrawItem(DrawItemEventArgs e)
     {
@@ -59,19 +77,21 @@ internal sealed class RealmlyComboBox : ComboBox
     }
     protected override void OnDropDown(EventArgs e)
     {
+        FitDropDown();
         // Let Windows render a dark scrollbar for long native dropdown lists.
         var info = new ComboInfo { Size = Marshal.SizeOf<ComboInfo>() };
         if (GetComboBoxInfo(Handle, ref info)) SetWindowTheme(info.List, "DarkMode_Explorer", null);
         base.OnDropDown(e); Invalidate();
     }
     protected override void OnDropDownClosed(EventArgs e) { base.OnDropDownClosed(e); Invalidate(); }
-    protected override void OnSelectedIndexChanged(EventArgs e) { base.OnSelectedIndexChanged(e); Invalidate(); }
+    protected override void OnSelectedIndexChanged(EventArgs e) { base.OnSelectedIndexChanged(e); _fullText?.SetToolTip(this, SelectedIndex >= 0 ? GetItemText(SelectedItem) : Text); Invalidate(); }
     protected override void OnEnabledChanged(EventArgs e) { base.OnEnabledChanged(e); Invalidate(); }
     protected override void OnGotFocus(EventArgs e) { base.OnGotFocus(e); Invalidate(); }
     protected override void OnLostFocus(EventArgs e) { base.OnLostFocus(e); Invalidate(); }
     protected override void OnMouseEnter(EventArgs e) { _hover = true; base.OnMouseEnter(e); Invalidate(); }
     protected override void OnMouseLeave(EventArgs e) { _hover = false; base.OnMouseLeave(e); Invalidate(); }
-    protected override void OnFontChanged(EventArgs e) { base.OnFontChanged(e); ItemHeight = Font.Height + Math.Max(6, 6 * DeviceDpi / 96); }
+    protected override void OnFontChanged(EventArgs e) { base.OnFontChanged(e); ItemHeight = Font.Height + Math.Max(6, 6 * DeviceDpi / 96); Parent?.PerformLayout(this, nameof(PreferredSize)); }
+    protected override void Dispose(bool disposing) { if (disposing) _fullText.Dispose(); base.Dispose(disposing); }
     [StructLayout(LayoutKind.Sequential)]
     private struct ComboInfo { public int Size; public Rectangle Item, Button; public int State; public IntPtr Combo, Edit, List; }
     [DllImport("user32.dll")] [return: MarshalAs(UnmanagedType.Bool)]

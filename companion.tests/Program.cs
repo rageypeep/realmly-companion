@@ -53,7 +53,11 @@ internal static class Program
         }
         if (args.Contains("--screenshots-only"))
         {
+            if (args.Contains("--dpi-unaware")) Application.SetHighDpiMode(HighDpiMode.DpiUnaware);
             ApplicationConfiguration.Initialize();
+            using var dpiProbe = new Control(); dpiProbe.CreateControl();
+            Assert(!args.Contains("--dpi-unaware") || dpiProbe.DeviceDpi == 96, "DPI-unaware fixture did not run at 96 DPI");
+            Console.WriteLine("Dropdown fixture DPI: " + dpiProbe.DeviceDpi);
             Directory.CreateDirectory(Path.GetFullPath(args[0]));
             ScreenshotTests.Run(args[0]);
             ScreenshotThemeTests.Run(args[0]);

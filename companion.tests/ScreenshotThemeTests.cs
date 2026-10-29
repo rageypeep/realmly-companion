@@ -40,7 +40,11 @@ internal static class ScreenshotThemeTests
             Check(bitmap.GetPixel(2,2).ToArgb()==Color.FromArgb(81,55,24).ToArgb(),"Dropdown highlight is not bronze");
             bitmap.Save(Path.Combine(output,"companion-dropdown-selected.png"));
         }
-        combo.DroppedDown=true;Application.DoEvents();Check(combo.DroppedDown,"Native dropdown no longer opens");combo.DroppedDown=false;
+        combo.Items.Add("Faelindra / Lightbringer: Reached level 16 (2026-10-29 11:48:35) / full recorded capture details");
+        combo.DroppedDown=true;Application.DoEvents();Check(combo.DroppedDown,"Native dropdown no longer opens");
+        var needed=TextRenderer.MeasureText(combo.Items[combo.Items.Count-1]?.ToString() ?? "",combo.Font).Width;
+        Check(combo.DropDownWidth>=Math.Min(needed,Screen.FromControl(combo).WorkingArea.Width-24*combo.DeviceDpi/96),"Long dropdown label remains constrained to the field width");
+        combo.DroppedDown=false;
         Application.DoEvents();
         using(var bitmap=new Bitmap(form.Width,form.Height)){form.DrawToBitmap(bitmap,new Rectangle(Point.Empty,bitmap.Size));bitmap.Save(Path.Combine(output,"companion-themed-screenshot-controls.png"));}
         grid.Rows.Clear();Application.DoEvents();Check(!grid.ScrollBar.Visible,"Scrollbar remains on an empty gallery");form.Close();

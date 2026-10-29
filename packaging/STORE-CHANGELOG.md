@@ -4,8 +4,16 @@ Store submissions can combine several Companion builds. The version headings
 below identify which build contains each change; they do not mean that every
 build was submitted to or published by Microsoft Store.
 
-The current Store package configuration is **0.2.10** (portable equivalent: **0.1.36**).
+The current Store package configuration is **0.2.11** (portable equivalent: **0.1.37**).
 Submission dates and the last published Store version are not tracked yet.
+
+## Ready to paste: 0.2.11 update from 0.2.10
+
+```text
+- Fixed dropdown boxes being clipped at larger Windows display scales.
+- Expanded opened menus for long labels and added full-text selection tooltips.
+- Preserved existing keyboard controls, screenshot matching and upload behavior.
+```
 
 ## Ready to paste: 0.2.10 update from 0.2.9
 
@@ -49,6 +57,15 @@ If the previous Store submission was older, also include the relevant changes
 from the build history below. Leave out changes already included in that submission.
 
 ## Build history
+
+### 0.2.11 - Dropdown clipping
+
+Portable equivalent: 0.1.37.
+
+- Correct dropdown layout height and native frame padding at scaled displays.
+- Wider opened lists and full-selection tooltips.
+- Full/narrow layout checks at 96 and 144 DPI.
+
 
 ### 0.2.10 - Screenshot destination recovery
 

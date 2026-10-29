@@ -1,5 +1,16 @@
 # Realmly Companion for Windows
 
+## 0.1.37 / Store 0.2.11: Dropdown clipping
+
+Fixed owner-drawn dropdowns extending below their parent rows at scaled display
+sizes. Automatic layout now reserves the native selection-frame padding, rather
+than relying on the stale native preferred-height cache. Regression checks cover
+the capture, character and day controls in full/narrow windows and at 96/144 DPI.
+
+Opened lists expand for long labels within the working screen width. A tooltip
+shows the full selected text when the closed field needs an ellipsis. Existing
+keyboard selection, styling and screenshot upload behavior are preserved.
+
 ## 0.1.36 / Store 0.2.10: Screenshot destination recovery
 
 Fixed a false "destination is missing" error when an addon migration changes the

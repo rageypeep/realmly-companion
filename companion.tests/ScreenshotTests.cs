@@ -67,6 +67,12 @@ internal static class ScreenshotTests
                 form.ClientSize=size;Application.DoEvents();
                 using var bitmap = new Bitmap(form.Width,form.Height);form.DrawToBitmap(bitmap,new Rectangle(Point.Empty,bitmap.Size));bitmap.Save(Path.Combine(output,$"companion-screenshots-{size.Width}.png"));
                 var status = Field<Label>(form,"_status");Check(status.Bottom<=status.Parent!.ClientSize.Height,"Screenshot status clipped");
+                foreach(var name in new[]{"_capture","_character","_day"})
+                {
+                    var dropdown=Field<ComboBox>(form,name);
+                    Check(dropdown.Bottom<=dropdown.Parent!.ClientSize.Height-dropdown.Parent.Padding.Bottom,"Dropdown clipped by parent: "+name);
+                    Check(dropdown.GetPreferredSize(Size.Empty).Height >= dropdown.Height,"Dropdown preferred height omits native frame: "+name);
+                }
             }
             Check(File.ReadAllBytes(path).SequenceEqual(original),"Uploading modified original");form.Close();
             using var rejected = new ScreenshotManagerForm(root,ClientKind.Retail,lua,"fixture-token",new RealmlyApi(http),_=>true);

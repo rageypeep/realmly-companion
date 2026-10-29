@@ -14,8 +14,8 @@ your account, ready to turn into chronicles on the website.
 [Microsoft Store patch notes](packaging/STORE-CHANGELOG.md) include individual build
 changes and combined text for Store submissions.
 
-> **Release status:** This repository contains the Companion's 0.1.36 source and
-> regression tests, plus a separate 0.2.10 Microsoft Store packaging configuration.
+> **Release status:** This repository contains the Companion's 0.1.37 source and
+> regression tests, plus a separate 0.2.11 Microsoft Store packaging configuration.
 > Current website downloads are unsigned portable builds; a signed
 > customer release is not available yet.
 
