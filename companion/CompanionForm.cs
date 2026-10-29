@@ -25,6 +25,7 @@ internal sealed class CompanionForm : RealmlyWindow
     private readonly Label _recordStatus = new() { AutoSize = true, MaximumSize = new Size(650, 0), UseMnemonic = false };
     private readonly Label _historyStatus = new() { AutoSize = true, MaximumSize = new Size(650, 0), UseMnemonic = false };
     private readonly Button _scan = new() { Text = "Refresh preview" };
+    private readonly Button _screenshots = new() { Text = "Screenshot manager" };
     private readonly Button _historyButton = new() { Text = "Upload history" };
     private UploadJournal _journal = new();
     private readonly bool _persistJournal;
@@ -100,7 +101,7 @@ internal sealed class CompanionForm : RealmlyWindow
             label.Margin = new Padding(0, 4, 0, 10);
         }
         _status.ForeColor = Color.FromArgb(225, 209, 175);
-        foreach (var button in new[] { _connect, _install, _upload, _checkAddon, _companionUpdate, _checkCompanion, _scan, _historyButton, _options }) StyleButton(button);
+        foreach (var button in new[] { _connect, _install, _upload, _checkAddon, _companionUpdate, _checkCompanion, _scan, _historyButton, _screenshots, _options }) StyleButton(button);
         if (CompanionDistribution.UsesMicrosoftStore)
             _checkCompanion.Text = "App updates: Microsoft Store";
         StyleButton(_manageSetups, compact: true);
@@ -151,6 +152,9 @@ internal sealed class CompanionForm : RealmlyWindow
         _uploadHints.SetToolTip(_savedVariables, "Choose WTF / Account / ... / SavedVariables / Realmly.lua, not the addon source.");
         _uploadHints.SetToolTip(_recordStatus, "New counts track uploads from this PC only. Website and other-PC uploads are not included. Review & upload shows all characters and dates; Realmly handles duplicates.");
         Add(upload);
+        var screenshots = Section("04  YOUR SCREENSHOTS", "Browse this setup's local images, match recorded milestones, and choose what to upload privately.");
+        FullRow(screenshots, 2, Actions(_screenshots));
+        Add(screenshots);
         Add(_status);
         Add(_companionUpdate);
         Add(Actions(_checkCompanion, _options));
@@ -191,6 +195,12 @@ internal sealed class CompanionForm : RealmlyWindow
         _checkAddon.Click += async (_, _) => await CheckAddonAsync();
         _upload.Click += async (_, _) => await UploadAsync();
         _scan.Click += async (_, _) => await RefreshPreviewAsync(force: true);
+        _screenshots.Click += async (_, _) => await BusyAsync("Managing local screenshots...", _ =>
+        {
+            using var manager = new ScreenshotManagerForm(_gameRoot.Text, SelectedClient, _savedVariables.Text, _settings.AccessToken, _api);
+            manager.ShowDialog(this);
+            return Task.CompletedTask;
+        });
         _historyButton.Click += (_, _) => ShowUploadHistory();
         _savedVariables.TextChanged += (_, _) => { _selectedSavedPath = _savedVariables.Text; if (!_switchingSetup) DisableAutoForPathChange(); _fileStamp = null; _previewRecords = _previewCharacters = null; _recordStatus.Text = "Refresh preview to inspect this file."; };
         Activated += async (_, _) => { if (Visible) { RefreshGameState(); await RefreshPreviewAsync(); } };
@@ -1126,7 +1136,7 @@ internal sealed class CompanionForm : RealmlyWindow
             UseWaitCursor = true;
             _connect.Enabled = _install.Enabled = _upload.Enabled = _checkAddon.Enabled = false;
             _checkCompanion.Enabled = _companionUpdate.Enabled = false;
-            _scan.Enabled = _historyButton.Enabled = false;
+            _scan.Enabled = _historyButton.Enabled = _screenshots.Enabled = false;
             _client.Enabled = _gameRoot.Enabled = _savedVariables.Enabled = _installations.Enabled = _manageSetups.Enabled = false;
             foreach (var browse in Controls.Find("browse", true)) browse.Enabled = false;
             await work(_lifetime.Token);
@@ -1150,7 +1160,7 @@ internal sealed class CompanionForm : RealmlyWindow
                 UseWaitCursor = false;
                 _connect.Enabled = _install.Enabled = _checkAddon.Enabled = true;
                 _checkCompanion.Enabled = _companionUpdate.Enabled = true;
-                _scan.Enabled = _historyButton.Enabled = true;
+                _scan.Enabled = _historyButton.Enabled = _screenshots.Enabled = true;
                 _client.Enabled = _gameRoot.Enabled = _savedVariables.Enabled = _installations.Enabled = _manageSetups.Enabled = true;
                 foreach (var browse in Controls.Find("browse", true)) browse.Enabled = true;
                 RefreshAccount();

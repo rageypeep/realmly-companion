@@ -4,8 +4,17 @@ Store submissions can combine several Companion builds. The version headings
 below identify which build contains each change; they do not mean that every
 build was submitted to or published by Microsoft Store.
 
-The current Store package is **0.2.7** (portable equivalent: **0.1.33**).
+The current Store package configuration is **0.2.8** (portable equivalent: **0.1.34**).
 Submission dates and the last published Store version are not tracked yet.
+
+## Ready to paste: 0.2.8 update from 0.2.7
+
+```text
+- Added a Screenshot Manager for separate Retail and Forever setups.
+- Preview local images and match recorded achievements or milestones by filename time.
+- Review character/day destinations and upload selected screenshots privately with automated moderation.
+- Original images stay untouched. Open Realmly to edit captions, preview badges and choose what to share.
+```
 
 ## Ready to paste: 0.2.7 update from 0.2.5
 
@@ -24,6 +33,16 @@ If the previous Store submission was older, also include the relevant changes
 from the build history below. Leave out changes already included in that submission.
 
 ## Build history
+
+### 0.2.8 - Screenshot manager
+
+Portable equivalent: 0.1.34.
+
+- Local screenshot browsing, safe previews and recorded milestone matching.
+- Explicit, cancellable private uploads using the paired Realmly account.
+- Separate game setups, destination review and preserved original files.
+- Website controls remain responsible for captions, badges and social sharing.
+
 
 ### 0.2.7 - Growing adventure histories
 

@@ -21,6 +21,8 @@
     <Compile Include="../companion/RealmlyWindow.cs" Link="RealmlyWindow.cs" />
     <Compile Include="../companion/RealmlyScrollPanel.cs" Link="RealmlyScrollPanel.cs" />
     <Compile Include="../companion/CompanionSettings.cs" Link="CompanionSettings.cs" />
+    <Compile Include="../companion/ScreenshotLibrary.cs" Link="ScreenshotLibrary.cs" />
+    <Compile Include="../companion/ScreenshotManagerForm.cs" Link="ScreenshotManagerForm.cs" />
     <Compile Include="../companion/RealmlyApi.cs" Link="RealmlyApi.cs" />
     <Compile Include="../companion/UploadPreview.cs" Link="UploadPreview.cs" />
     <Compile Include="../companion/UploadJournal.cs" Link="UploadJournal.cs" />

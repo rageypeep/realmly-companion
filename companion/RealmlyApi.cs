@@ -11,7 +11,7 @@ internal sealed class RealmlyApi
     private readonly HttpClient _http;
 
     public RealmlyApi(HttpClient? http = null) => _http = http ?? new HttpClient
-        { BaseAddress = new Uri("https://realmly.me/"), Timeout = TimeSpan.FromSeconds(30) };
+        { BaseAddress = new Uri("https://realmly.me/"), Timeout = TimeSpan.FromSeconds(90) };
 
     public async Task<PairingRequest> StartPairingAsync(CancellationToken cancellationToken)
     {
@@ -47,6 +47,29 @@ internal sealed class RealmlyApi
         return await Read<UploadResult>(response, cancellationToken);
     }
 
+    public Task<ScreenshotCharacters> ScreenshotCharactersAsync(string token, CancellationToken ct) =>
+        ScreenshotRequestAsync<ScreenshotCharacters>("api/companion/screenshot-characters", token, null, ct);
+
+    public Task<ScreenshotDays> ScreenshotDaysAsync(string slug, string token, CancellationToken ct) =>
+        ScreenshotRequestAsync<ScreenshotDays>($"api/my/characters/{Uri.EscapeDataString(slug)}/screenshot-days", token, null, ct);
+
+    public Task<ScreenshotMatchResponse> ScreenshotMatchesAsync(string slug, string day, string filename, string token, CancellationToken ct) =>
+        ScreenshotRequestAsync<ScreenshotMatchResponse>($"api/my/characters/{Uri.EscapeDataString(slug)}/days/{Uri.EscapeDataString(day)}/screenshot-matches?filename={Uri.EscapeDataString(filename)}", token, null, ct);
+
+    public Task<ScreenshotUploadResult> UploadScreenshotAsync(string slug, string day, string image, string? milestoneId, string token, CancellationToken ct) =>
+        ScreenshotRequestAsync<ScreenshotUploadResult>($"api/my/characters/{Uri.EscapeDataString(slug)}/days/{Uri.EscapeDataString(day)}/screenshots", token, new {image, milestoneId}, ct);
+
+    private async Task<T> ScreenshotRequestAsync<T>(string url, string token, object? body, CancellationToken ct)
+    {
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        deadline.CancelAfter(TimeSpan.FromSeconds(90));
+        using var request = new HttpRequestMessage(body is null ? HttpMethod.Get : HttpMethod.Post, url);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        if (body is not null) request.Content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json");
+        using var response = await _http.SendAsync(request, deadline.Token);
+        return await Read<T>(response, deadline.Token);
+    }
+
     public async Task<CompanionRelease> GetLatestReleaseAsync(CancellationToken cancellationToken)
     {
         using var response = await _http.GetAsync($"downloads/RealmlyCompanion-release.json?check={DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}", cancellationToken);
@@ -74,3 +97,13 @@ internal sealed class RealmlyApiException(int statusCode, string message) : Inva
 {
     public int StatusCode { get; } = statusCode;
 }
+
+internal sealed record ScreenshotCharacter(string Slug, string AdventurerId, string CharacterName, string RealmName, string? GameVersion)
+{
+    public override string ToString() => $"{CharacterName} / {RealmName} ({GameVersion ?? "unknown"})";
+}
+internal sealed record ScreenshotCharacters(ScreenshotCharacter[] Characters);
+internal sealed record ScreenshotDays(string[] Days);
+internal sealed record ScreenshotCandidate(string Id, string Title, string RequestedAtLocal);
+internal sealed record ScreenshotMatchResponse(ScreenshotCandidate[] Matches, ScreenshotCandidate[] Candidates);
+internal sealed record ScreenshotUploadResult(bool Ok, string Id);

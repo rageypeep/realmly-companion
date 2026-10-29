@@ -14,8 +14,8 @@ your account, ready to turn into chronicles on the website.
 [Microsoft Store patch notes](packaging/STORE-CHANGELOG.md) include individual build
 changes and combined text for Store submissions.
 
-> **Release status:** This repository contains the Companion's 0.1.33 source and
-> regression tests, plus a separate 0.2.7 Microsoft Store packaging configuration.
+> **Release status:** This repository contains the Companion's 0.1.34 source and
+> regression tests, plus a separate 0.2.8 Microsoft Store packaging configuration.
 > Current website downloads are unsigned portable builds; a signed
 > customer release is not available yet.
 
@@ -28,6 +28,7 @@ changes and combined text for Store submissions.
 - **Connect securely** through approval in your browser. Battle.net sign-in stays
   on the website; you do not enter your Battle.net password in the Companion.
 - **Review before uploading** with character names, adventure dates and record counts.
+- **Manage local screenshots** for each setup, preview images, match recorded milestones, and review private uploads. Originals stay untouched; captions, badges and social sharing are managed on Realmly.
 - **See upload history** and distinguish accepted uploads, duplicates and failures.
 - **Remember named setups** for different game installations and clients.
 - **Use optional tray mode** and update notifications.

@@ -27,3 +27,10 @@ Uploads stay manual by default. Never execute SavedVariables as Lua.
 - [x] Verify 0.1.22 setup migration/switching, diagnostics privacy and clipboard stub, UI renders and release ZIP.
 - [x] Verify 0.1.23 automatic-upload consent/defaults, stable saves, retry/auth/cancellation behavior, closing-window race and public ZIP SHA256.
 - [x] Verify 0.1.24 disabled notification label contrast, dependency hint, enabled behavior and public ZIP SHA256.
+
+## Completed: Screenshot Manager (0.1.34 / Store 0.2.8)
+
+- [x] Browse setup-specific Retail/Forever screenshot folders and preview images.
+- [x] Match successful addon captures using recorded local filename timestamps and UTC adventure dates.
+- [x] Review destinations and upload selected images privately through moderation.
+- [x] Preserve originals, support cancellation, and link to the web manager for sharing/editing.

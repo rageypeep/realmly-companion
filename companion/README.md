@@ -1,5 +1,29 @@
 # Realmly Companion for Windows
 
+## 0.1.34 / Store 0.2.8: Screenshot manager
+
+A new Screenshot manager button opens a setup-specific local library. Retail and
+Forever use separate Screenshots folders; a folder picker handles custom layouts.
+JPG, PNG and BMP are supported. Discovery is non-recursive and bounded to 2,000
+images. Only the selected preview is decoded; decode work is serialized.
+
+The data-only Lua reader matches successful recorded captures to the original
+WoWScrnShot filename within five seconds of the recorded local wall clock. Its
+adventure day comes from the event's UTC timestamp, including around midnight.
+Ambiguous captures need a choice; renamed/plain images need an explicit character
+and recorded day. A mismatched-client Lua file never supplies automatic matches.
+
+Connect and upload Realmly.lua first. Check up to six images, review their exact
+destinations, then upload privately. The paired token is accepted only by the
+website's screenshot operations. Images are resized to 2,048px, metadata stripped
+by re-encoding, and sent through existing moderation/WebP storage/quotas. Original
+local files are never changed or deleted. Cancel operation stops active work.
+
+Manage on Realmly opens the web manager for final badge previews, captions,
+deletions and explicit social publication. The app does not publish images or
+chronicles. Duplicate uploads are blocked during the manager visit; this is not
+a persistent synchronization service. Refresh does not watch or upload files.
+
 ## 0.1.33 / Store 0.2.7: Growing SavedVariables histories
 
 Valid histories with more than 60,000 nested table fields now preview normally.
