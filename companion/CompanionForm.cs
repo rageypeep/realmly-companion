@@ -6,7 +6,7 @@ internal sealed class CompanionForm : RealmlyWindow
 {
     private readonly CompanionSettings _settings;
     private readonly RealmlyApi _api;
-    private readonly ComboBox _client = new() { DropDownStyle = ComboBoxStyle.DropDownList };
+    private readonly ComboBox _client = new RealmlyComboBox() { DropDownStyle = ComboBoxStyle.DropDownList };
     private readonly TextBox _gameRoot = new();
     private readonly TextBox _savedVariables = new();
     private readonly Label _account = new();
@@ -40,7 +40,7 @@ internal sealed class CompanionForm : RealmlyWindow
     private readonly System.Windows.Forms.Timer _updateTimer = new() { Interval = 6 * 60 * 60 * 1000 };
     private bool _exitRequested, _restarting = false;
     private FormWindowState _restoreState = FormWindowState.Normal;
-    private readonly ComboBox _installations = new() { DropDownStyle = ComboBoxStyle.DropDownList };
+    private readonly ComboBox _installations = new RealmlyComboBox() { DropDownStyle = ComboBoxStyle.DropDownList };
     private readonly Button _manageSetups = new() { Text = "Setups..." };
     private WowInstallation _currentInstallation;
     private bool _switchingSetup;

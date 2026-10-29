@@ -12,13 +12,13 @@ internal sealed class ScreenshotManagerForm : RealmlyWindow
     private readonly string _lua;
     private string _folder;
     private readonly CancellationTokenSource _lifetime = new();
-    private readonly DataGridView _grid = new();
+    private readonly RealmlyScreenshotGrid _grid = new();
     private readonly PictureBox _preview = new() { Dock = DockStyle.Fill, SizeMode = PictureBoxSizeMode.Zoom, BackColor = Color.FromArgb(8, 7, 5) };
     private readonly Label _status = new() { AutoSize = true, UseMnemonic = false, Dock = DockStyle.Fill };
     private readonly Label _details = new() { AutoSize = true, UseMnemonic = false, Dock = DockStyle.Fill };
-    private readonly ComboBox _capture = new() { DropDownStyle = ComboBoxStyle.DropDownList, Dock = DockStyle.Fill };
-    private readonly ComboBox _character = new() { DropDownStyle = ComboBoxStyle.DropDownList, Dock = DockStyle.Fill };
-    private readonly ComboBox _day = new() { DropDownStyle = ComboBoxStyle.DropDownList, Dock = DockStyle.Fill };
+    private readonly ComboBox _capture = new RealmlyComboBox() { DropDownStyle = ComboBoxStyle.DropDownList, Dock = DockStyle.Fill };
+    private readonly ComboBox _character = new RealmlyComboBox() { DropDownStyle = ComboBoxStyle.DropDownList, Dock = DockStyle.Fill };
+    private readonly ComboBox _day = new RealmlyComboBox() { DropDownStyle = ComboBoxStyle.DropDownList, Dock = DockStyle.Fill };
     private readonly Button _upload;
     private readonly Button _cancel;
     private readonly Func<string, bool> _confirmUpload;
@@ -56,7 +56,7 @@ internal sealed class ScreenshotManagerForm : RealmlyWindow
         body.Controls.Add(actions, 0, 1);
         var split = new TableLayoutPanel { ColumnCount = 2, RowCount = 1, Dock = DockStyle.Fill, Margin = new Padding(0, 10, 0, 10) };
         split.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 48)); split.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 52)); split.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-        ConfigureGrid(); split.Controls.Add(_grid, 0, 0);
+        ConfigureGrid(); split.Controls.Add(_grid.CreateViewport(), 0, 0);
         var right = new TableLayoutPanel { ColumnCount = 1, RowCount = 4, Dock = DockStyle.Fill, Padding = new Padding(12, 0, 0, 0) };
         right.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100)); right.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         for (var i = 0; i < 3; i++) right.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -96,7 +96,7 @@ internal sealed class ScreenshotManagerForm : RealmlyWindow
         _grid.BackgroundColor = Color.FromArgb(20, 16, 11); _grid.BorderStyle = BorderStyle.FixedSingle; _grid.EnableHeadersVisualStyles = false;
         _grid.DefaultCellStyle = new DataGridViewCellStyle { BackColor = Color.FromArgb(25, 20, 14), ForeColor = ForeColor, SelectionBackColor = Color.FromArgb(80, 57, 26), SelectionForeColor = Color.FromArgb(255, 238, 192) };
         _grid.ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle { BackColor = Color.FromArgb(42, 30, 16), ForeColor = ForeColor };
-        _grid.Columns.Add(new DataGridViewCheckBoxColumn { Name = "Include", HeaderText = "Send", MinimumWidth = 64, FillWeight = 23 });
+        _grid.Columns.Add(new DataGridViewCheckBoxColumn { Name = "Include", CellTemplate = new RealmlyCheckBoxCell(), HeaderText = "Send", MinimumWidth = 64, FillWeight = 23 });
         _grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "File", HeaderText = "Screenshot", ReadOnly = true, FillWeight = 95 });
         _grid.Columns.Add(new DataGridViewTextBoxColumn { Name = "Match", HeaderText = "Recorded milestone", ReadOnly = true, FillWeight = 95 });
         _grid.CurrentCellDirtyStateChanged += (_, _) => { if (_grid.IsCurrentCellDirty) _grid.CommitEdit(DataGridViewDataErrorContexts.Commit); };

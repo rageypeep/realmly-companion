@@ -4,8 +4,16 @@ Store submissions can combine several Companion builds. The version headings
 below identify which build contains each change; they do not mean that every
 build was submitted to or published by Microsoft Store.
 
-The current Store package configuration is **0.2.8** (portable equivalent: **0.1.34**).
+The current Store package configuration is **0.2.9** (portable equivalent: **0.1.35**).
 Submission dates and the last published Store version are not tracked yet.
+
+## Ready to paste: 0.2.9 update from 0.2.8
+
+```text
+- Updated screenshot checkboxes and scrollbars to Realmly's gold and bronze style.
+- Added matching dark dropdown menus throughout the Companion and Screenshot Manager.
+- Preserved keyboard navigation, native selection and accessible checkbox behavior.
+```
 
 ## Ready to paste: 0.2.8 update from 0.2.7
 
@@ -33,6 +41,15 @@ If the previous Store submission was older, also include the relevant changes
 from the build history below. Leave out changes already included in that submission.
 
 ## Build history
+
+### 0.2.9 - Themed controls
+
+Portable equivalent: 0.1.35.
+
+- Gold screenshot ticks and custom bronze/gold library scrolling.
+- Dark setup, client, capture, character and day dropdowns with bronze highlights.
+- Preserved keyboard and accessibility behavior.
+
 
 ### 0.2.8 - Screenshot manager
 

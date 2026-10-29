@@ -1,5 +1,17 @@
 # Realmly Companion for Windows
 
+## 0.1.35 / Store 0.2.9: Consistent themed controls
+
+Screenshot selection uses the same bronze boxes and gold ticks as the existing
+app settings. The library uses Realmly's gold scrollbar, including wheel,
+dragging, page navigation and keyboard support. Empty libraries hide the bar.
+
+Setup, game client, capture, character and day dropdowns now have dark faces,
+gold borders/arrows and bronze selection highlights. They retain native list
+selection, keyboard navigation and accessibility. Long native dropdown lists
+request Windows' dark scrollbar theme. Captions and checkbox states remain
+readable while controls are disabled.
+
 ## 0.1.34 / Store 0.2.8: Screenshot manager
 
 A new Screenshot manager button opens a setup-specific local library. Retail and

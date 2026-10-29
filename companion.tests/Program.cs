@@ -56,6 +56,7 @@ internal static class Program
             ApplicationConfiguration.Initialize();
             Directory.CreateDirectory(Path.GetFullPath(args[0]));
             ScreenshotTests.Run(args[0]);
+            ScreenshotThemeTests.Run(args[0]);
             return;
         }
         UploadTests.Run();
@@ -296,6 +297,7 @@ internal static class Program
         SetupDiagnosticsTests.Run(output);
         AutomaticUploadTests.Run(output);
         ScreenshotTests.Run(output);
+        ScreenshotThemeTests.Run(output);
         using (var dialog = (Form)typeof(CompanionForm).GetMethod("CreateUploadDialog", flags)!.Invoke(form, [UploadPreview.Parse(UploadTests.Source, [])])!)
         {
             dialog.StartPosition = FormStartPosition.Manual; dialog.Location = new Point(-30000, -30000); dialog.Show();
