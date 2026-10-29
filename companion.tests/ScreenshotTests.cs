@@ -30,6 +30,14 @@ internal static class ScreenshotTests
         Check(captures.Length == 1 && captures[0].Day == "2026-10-28" && captures[0].Title == "Level 40!", "Successful capture and recorded UTC day");
         try { ScreenshotLibrary.Captures(Source,ClientKind.Forever);throw new Exception("Client mismatch accepted"); } catch (InvalidOperationException) { }
         try { ScreenshotLibrary.Captures("RealmlyDB={}; print('bad')",ClientKind.Retail);throw new Exception("Executable Lua accepted"); } catch (InvalidOperationException) { }
+        var canonical = new ScreenshotCharacter("fixture", "legacy-profile-id", "fixture", "REALM", "retail");
+        Check(ScreenshotLibrary.ResolveCaptureCharacter(captures[0], [canonical], ClientKind.Retail) == canonical, "Canonical ID recovery must match name/realm ignoring case");
+        Check(ScreenshotLibrary.ResolveCaptureCharacter(captures[0], [canonical with {GameVersion="forever"}], ClientKind.Retail) is null, "Recovery crossed game versions");
+        Check(ScreenshotLibrary.ResolveCaptureCharacter(captures[0], [canonical with {RealmName="Other"}], ClientKind.Retail) is null, "Recovery crossed realms");
+        Check(ScreenshotLibrary.ResolveCaptureCharacter(captures[0], [canonical,canonical with {Slug="duplicate",AdventurerId="other"}], ClientKind.Retail) is null, "Ambiguous recovery guessed a character");
+        Check(ScreenshotLibrary.ResolveCaptureCharacter(captures[0], [], ClientKind.Retail) is null, "Unowned character accepted");
+        var exact = canonical with {AdventurerId="retail-fixture",CharacterName="Renamed"};
+        Check(ScreenshotLibrary.ResolveCaptureCharacter(captures[0], [canonical,exact], ClientKind.Retail) == exact, "Stable exact ID must take priority");
         var root = Path.Combine(Path.GetTempPath(), "realmly-screenshot-tests-" + Guid.NewGuid().ToString("N"));
         var folder = ScreenshotLibrary.Folder(root,ClientKind.Retail);Directory.CreateDirectory(folder);
         Check(!folder.Equals(ScreenshotLibrary.Folder(root,ClientKind.Forever)), "Game folders mixed");
@@ -72,6 +80,15 @@ internal static class ScreenshotTests
             Field<CancellationTokenSource>(rejected,"_work").Cancel();Pump(cancelled);
             Check(rejectedGrid.Rows[0].Cells[0].Value is true && handler.Uploads==1 && !Field<bool>(rejected,"_busy"),"Cancellation lost selection or left manager busy");
             rejected.Close();
+            handler.RejectUploads=false;handler.UseCanonicalId=true;
+            using var migrated = new ScreenshotManagerForm(root,ClientKind.Retail,lua,"fixture-token",new RealmlyApi(http),_=>true);
+            migrated.StartPosition=FormStartPosition.Manual;migrated.Location=new Point(-30000,-30000);migrated.Show();
+            Pump(WaitUntil(()=>Field<DataGridView>(migrated,"_grid").Rows.Count==1 && Field<Button>(migrated,"_upload").Enabled));
+            Field<DataGridView>(migrated,"_grid").Rows[0].Cells[0].Value=true;
+            var before=handler.Uploads;
+            Pump((Task)typeof(ScreenshotManagerForm).GetMethod("UploadAsync",Private)!.Invoke(migrated,null)!);
+            Check(handler.Uploads==before+1,"A valid destination was rejected after the website retained the character's legacy ID: "+Field<Label>(migrated,"_status").Text);
+            migrated.Close();
             Console.WriteLine("PASS screenshot filename/UTC matching, client isolation, ambiguity, safe image conversion, bearer API upload, duplicate guard and window layouts");
         }
         finally
@@ -85,10 +102,11 @@ internal static class ScreenshotTests
     {
         public int Uploads;
         public bool RejectUploads;
+        public bool UseCanonicalId;
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken ct)
         {
             Check(request.Headers.Authorization?.ToString()=="Bearer fixture-token","Screenshot token missing");var url=request.RequestUri!.AbsolutePath;object response;
-            if(url.EndsWith("screenshot-characters"))response=new {characters=new[]{new {slug="fixture",adventurerId="retail-fixture",characterName="Fixture",realmName="Realm",gameVersion="retail"},new {slug="other",adventurerId="forever-fixture",characterName="Other",realmName="Realm",gameVersion="forever"}}};
+            if(url.EndsWith("screenshot-characters"))response=new {characters=new[]{new {slug="fixture",adventurerId=UseCanonicalId?"legacy-profile-id":"retail-fixture",characterName="Fixture",realmName="Realm",gameVersion="retail"},new {slug="other",adventurerId="forever-fixture",characterName="Other",realmName="Realm",gameVersion="forever"}}};
             else if(url.EndsWith("screenshot-days"))response=new {days=new[]{"2026-10-28"}};
             else if(url.EndsWith("screenshot-matches"))response=new {matches=new[]{new {id="capture",title="Level 40!",requestedAtLocal="2026-10-29T00:00:02"}},candidates=Array.Empty<object>()};
             else if(request.Method==HttpMethod.Post && url.EndsWith("screenshots"))

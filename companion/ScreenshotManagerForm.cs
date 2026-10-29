@@ -190,9 +190,20 @@ internal sealed class ScreenshotManagerForm : RealmlyWindow
         foreach (var row in selected)
         {
             var file = (LocalScreenshot)row.Tag!;
-            var character = file.Capture is { } capture ? _characters.SingleOrDefault(c => c.AdventurerId == capture.AdventurerId) : _character.SelectedItem as ScreenshotCharacter;
+            var character = file.Capture is { } capture ? ScreenshotLibrary.ResolveCaptureCharacter(capture, _characters, _client) : _character.SelectedItem as ScreenshotCharacter;
             var day = file.Capture?.Day ?? _day.SelectedItem as string;
-            if (character is null || day is null) { _status.Text = "A destination is missing. Upload addon data to your connected account first, or choose a character and adventure day for plain images."; return; }
+            if (character is null)
+            {
+                _status.Text = file.Capture is { } missing
+                    ? $"{Path.GetFileName(file.Path)}: no unique uploaded {_client} character matches {missing.CharacterName} / {missing.Realm}. Upload this character's latest Realmly.lua to the connected account, or select No capture / plain image and choose a destination."
+                    : $"{Path.GetFileName(file.Path)}: choose a destination character for this plain image.";
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(day))
+            {
+                _status.Text = $"{Path.GetFileName(file.Path)}: choose an adventure day for {character.CharacterName}. If the day list is empty, upload this character's addon data first.";
+                return;
+            }
             plan.Add((row, file, character, day));
         }
         var summary = string.Join(Environment.NewLine, plan.Select(p => $"{Path.GetFileName(p.File.Path)} -> {p.Character.CharacterName} / {p.Day}" + (p.File.Capture is null ? " (plain image)" : $" / {p.File.Capture.Title}")));

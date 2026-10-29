@@ -68,6 +68,17 @@ internal static partial class ScreenshotLibrary
         }
         return captures.ToArray();
     }
+    // Uploads can retain the website's established ID after a local addon migration.
+    // The caller supplies only characters returned for its paired account.
+    public static ScreenshotCharacter? ResolveCaptureCharacter(ScreenshotCapture capture, IEnumerable<ScreenshotCharacter> ownedCharacters, ClientKind client)
+    {
+        var sameGame = ownedCharacters.Where(c => string.Equals(c.GameVersion, client.ToString(), StringComparison.OrdinalIgnoreCase)).ToArray();
+        var exact = sameGame.Where(c => c.AdventurerId == capture.AdventurerId).ToArray();
+        if (exact.Length > 0) return exact.Length == 1 ? exact[0] : null;
+        var identity = sameGame.Where(c => string.Equals(c.CharacterName?.Trim(), capture.CharacterName.Trim(), StringComparison.OrdinalIgnoreCase)
+            && string.Equals(c.RealmName?.Trim() ?? "", capture.Realm.Trim(), StringComparison.OrdinalIgnoreCase)).ToArray();
+        return identity.Length == 1 ? identity[0] : null;
+    }
     public static LocalScreenshot[] Scan(string folder, ScreenshotCapture[] captures, CancellationToken ct)
     {
         if (!Directory.Exists(folder)) return [];

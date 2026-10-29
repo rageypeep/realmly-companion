@@ -4,8 +4,8 @@
 from portable releases. Use them to combine changes when skipping Store builds.
 
 This creates a self-contained Windows x64 MSIX of the existing WinForms app.
-The Store flavour is **0.2.9**, requires Windows 10 build 19041 or later, and uses
-Microsoft Store for Companion updates. Portable development builds remain 0.1.35
+The Store flavour is **0.2.10**, requires Windows 10 build 19041 or later, and uses
+Microsoft Store for Companion updates. Portable development builds remain 0.1.36
 with their existing updater. Addon checking, installation, uploads and tray mode
 remain available in both flavours.
 
@@ -40,7 +40,7 @@ Install the .NET 8 SDK and Windows 10/11 SDK on Windows. From the repository roo
 
 The script prints the MSIX path and SHA-256. Every build has a fresh directory
 under `artifacts/msix/`; generated packages and logos are not committed.
-Package version 0.2.9.0 and display version 0.2.9 match. Use `-Version` with a
+Package version 0.2.10.0 and display version 0.2.10 match. Use `-Version` with a
 new four-part version ending in `.0` when submitting a later Store release.
 
 The MSIX is **unsigned for submission**. It is not a directly installable,

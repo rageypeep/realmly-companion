@@ -4,8 +4,16 @@ Store submissions can combine several Companion builds. The version headings
 below identify which build contains each change; they do not mean that every
 build was submitted to or published by Microsoft Store.
 
-The current Store package configuration is **0.2.9** (portable equivalent: **0.1.35**).
+The current Store package configuration is **0.2.10** (portable equivalent: **0.1.36**).
 Submission dates and the last published Store version are not tracked yet.
+
+## Ready to paste: 0.2.10 update from 0.2.9
+
+```text
+- Fixed screenshot uploads incorrectly reporting a missing destination after an addon character-ID migration.
+- Improved destination errors to identify the affected image and any missing character or adventure day.
+- Existing character data, screenshots and sharing choices are preserved.
+```
 
 ## Ready to paste: 0.2.9 update from 0.2.8
 
@@ -41,6 +49,15 @@ If the previous Store submission was older, also include the relevant changes
 from the build history below. Leave out changes already included in that submission.
 
 ## Build history
+
+### 0.2.10 - Screenshot destination recovery
+
+Portable equivalent: 0.1.36.
+
+- Reconnects migrated local capture IDs to the same owned character, realm and game version.
+- Rejects ambiguous identities and retains server-side capture checks.
+- Shows image-specific character/day guidance instead of a generic missing destination.
+
 
 ### 0.2.9 - Themed controls
 

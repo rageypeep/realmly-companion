@@ -1,5 +1,18 @@
 # Realmly Companion for Windows
 
+## 0.1.36 / Store 0.2.10: Screenshot destination recovery
+
+Fixed a false "destination is missing" error when an addon migration changes the
+local Adventurer ID but Realmly retains the established profile ID. Captures
+first resolve by exact ID, then by a unique case-insensitive character name and
+realm within the connected account and selected game version. Ambiguous or
+unowned identities remain rejected. The server still verifies the recorded
+capture against the owned character/day before accepting a milestone image.
+
+Missing-destination messages now identify the affected filename and distinguish
+an unavailable recorded character from a missing plain-image character or day.
+No character data or existing images are changed.
+
 ## 0.1.35 / Store 0.2.9: Consistent themed controls
 
 Screenshot selection uses the same bronze boxes and gold ticks as the existing
