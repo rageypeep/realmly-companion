@@ -15,7 +15,7 @@ your account, ready to turn into chronicles on the website.
 changes and combined text for Store submissions.
 
 > **Release status:** This repository contains the Companion's 0.1.37 source and
-> regression tests, plus a separate 0.2.11 Microsoft Store packaging configuration.
+> regression tests, plus a separate 0.3.0 Microsoft Store packaging configuration.
 > Current website downloads are unsigned portable builds; a signed
 > customer release is not available yet.
 

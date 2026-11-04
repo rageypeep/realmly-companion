@@ -1,5 +1,12 @@
 # Realmly Companion for Windows
 
+## Store 0.3.0: Screenshot Manager release
+
+The Store release combines the screenshot library, recorded milestone matching,
+private uploads, destination recovery and themed/DPI-aware controls described
+below. Its portable equivalent remains 0.1.37. See the combined Store submission
+notes in `packaging/STORE-CHANGELOG.md`.
+
 ## 0.1.37 / Store 0.2.11: Dropdown clipping
 
 Fixed owner-drawn dropdowns extending below their parent rows at scaled display

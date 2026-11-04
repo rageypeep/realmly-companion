@@ -4,8 +4,21 @@ Store submissions can combine several Companion builds. The version headings
 below identify which build contains each change; they do not mean that every
 build was submitted to or published by Microsoft Store.
 
-The current Store package configuration is **0.2.11** (portable equivalent: **0.1.37**).
+The current Store package configuration is **0.3.0** (portable equivalent: **0.1.37**).
 Submission dates and the last published Store version are not tracked yet.
+
+## Ready to paste: 0.3.0 - Screenshot Manager and reliability fixes
+
+```text
+- New Screenshot Manager: browse and preview your Retail and Forever screenshots in separate libraries.
+- Match screenshots to recorded achievements and milestones, review their character/day destinations, and upload selected images privately to Realmly.
+- Original images stay untouched. Manage captions, badges and sharing on the website.
+- Fixed screenshot destinations after addon character-ID migrations.
+- Added matching dark dropdowns, gold checkboxes and bronze/gold scrolling.
+- Fixed clipped dropdowns at larger Windows display scales and improved long-label readability.
+
+Your existing adventures, screenshots, setups and sharing choices are preserved.
+```
 
 ## Ready to paste: 0.2.11 update from 0.2.10
 
@@ -57,6 +70,11 @@ If the previous Store submission was older, also include the relevant changes
 from the build history below. Leave out changes already included in that submission.
 
 ## Build history
+
+### 0.3.0 - Screenshot-feature Store release
+
+Combines the Screenshot Manager and fixes from 0.2.8 through 0.2.11.
+Portable equivalent: 0.1.37. No new portable release is created by this Store version bump.
 
 ### 0.2.11 - Dropdown clipping
 
