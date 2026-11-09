@@ -4,8 +4,108 @@ Store submissions can combine several Companion builds. The version headings
 below identify which build contains each change; they do not mean that every
 build was submitted to or published by Microsoft Store.
 
-The current Store package configuration is **0.3.0** (portable equivalent: **0.1.37**).
+The current Store package configuration is **0.5.1** (portable equivalent: **0.1.45**).
 Submission dates and the last published Store version are not tracked yet.
+
+## Ready to paste: 0.5.1 - Translate, Add-on Manager and Discord
+
+This combined Store release brings together the two main additions, translation
+and add-on management. The final `.1` marks the Discord tab addition. Earlier
+entries below remain the development history, not a record of Store submissions.
+
+```text
+Translate
+- Paste chat for an English translation, with optional suggested replies in the original language and English.
+- Choose Translate only or Translate & reply using a large button and themed switch.
+- Text is sent to OpenAI only when you click Translate. It stays separate from character profiles and chronicles, with no local translation history.
+
+Add-on Manager
+- Install, check for updates and uninstall Chat Copy or Sparkles directly in the Companion.
+- See installed and latest versions. The app handles downloading, verification and installation into your selected WoW folder's _forever_/Interface/AddOns directory.
+- Forever must be closed for installation or removal. Saved settings and herb history are preserved. Sparkles includes dedicated original artwork.
+
+Discord
+- New Discord tab with a large Join the Discord button for the Realmly community, support, bug reports and suggestions.
+
+Existing uploads, screenshots, account connections and setup preferences are preserved.
+```
+
+## Ready to paste: 0.3.8 - Sparkles artwork and layout
+
+```text
+- Dedicated original Sparkles icon in Add-ons, matching its new in-game artwork.
+- Fixes blank space at the bottom of the Add-ons scroll area at some window sizes.
+- Updated Realmly add-ons include copyable Discord community invites.
+- Existing installation, update, uninstall and saved-setting behaviour is preserved.
+```
+
+## Ready to paste: 0.3.7 - Sparkles artwork
+
+```text
+- Sparkles now has dedicated original artwork in Add-ons: a golden sparkle, herb sprig and ore crystal.
+- Matches the new Realmly Sparkles in-game icon. Updated add-ons include copyable Discord community invites.
+- Install, update, uninstall and saved-setting behaviour are unchanged.
+```
+
+## Ready to paste: 0.3.6 - Uninstall and community
+
+```text
+- Uninstall Chat Copy or Sparkles directly from Add-ons, with confirmation showing the target folder.
+- Removal requires Forever to be closed and preserves saved settings and herb history. Sparkles includes a reminder to use Turn off & restore first.
+- New Discord tab with a large Join the Discord button, selectable invite and friendly community/support information.
+- Discord opens only when requested; joining and sign-in remain in Discord.
+```
+
+## Ready to paste: 0.3.5 - Simpler Add-ons controls
+
+```text
+- Removed the manual ZIP download buttons from Add-ons.
+- Install and Update handle downloads, verification and installation directly in the app.
+- Installed/latest version checks and existing safeguards are preserved.
+```
+
+## Ready to paste: 0.3.4 - Install and update optional add-ons
+
+```text
+- Install Chat Copy and Sparkles directly from Add-ons into your selected WoW folder's _forever_/Interface/AddOns directory.
+- See installed and latest versions, with Install, Update and Up to date states.
+- Version checks run when opening Add-ons and through the existing update-check cycle. Updates remain an explicit action while Forever is closed.
+- Downloads are checked against the official release catalog, SHA-256 and Forever TOC. Staged replacement and rollback protect existing installations.
+- SavedVariables, herb history, Retail files and the main recorder are preserved. No account connection is needed.
+```
+
+## Ready to paste: 0.3.3 - Optional Add-ons
+
+```text
+- New Add-ons tab beside Translate, with Chat Copy and Sparkles for WoW Forever.
+- Browse features, in-game commands and installation instructions without connecting an account.
+- Download buttons open official add-on ZIPs in your browser; installation stays manual.
+- Gathering is now called Realmly Sparkles in-game. Existing settings, saved herb locations and the /rlg command are preserved; /rls also opens it.
+- Character uploads, screenshots, translation and existing setup preferences are unchanged.
+```
+
+## Ready to paste: 0.3.2 - Translate your way
+
+```text
+- Choose Translate only or Translate & reply using the themed Suggest a reply switch.
+- A large action button changes its label to match your choice.
+- Translate-only hides reply guidance and suggestions, and asks the AI only for the English translation.
+- Switching modes clears old results; reply guidance is never sent in translate-only mode.
+- Existing uploads, screenshots, account connection and character tools are unchanged.
+```
+
+## Ready to paste: 0.3.1 - Translate messages
+
+```text
+- New independent Translate tab, styled in Realmly's dark, bronze and gold colours.
+- Paste a message for an English translation and a suggested reply in its original language, with an English version alongside it.
+- Guide the reply with optional wording, review it, and copy either version yourself.
+- Translation requires your connected Realmly account and sends only the pasted message and reply guidance to OpenAI when you click Translate.
+- Messages stay separate from character profiles, uploads, screenshots and chronicles. No local translation history or automatic chat sending.
+- Includes cancellation, Clear, input limits and protection against stale replies.
+
+Existing adventures, uploads, screenshots, setups and sharing choices are preserved.
+```
 
 ## Ready to paste: 0.3.0 - Screenshot Manager and reliability fixes
 

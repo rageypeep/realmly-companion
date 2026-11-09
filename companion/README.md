@@ -1,5 +1,75 @@
 # Realmly Companion for Windows
 
+## Microsoft Store 0.5.1: Translate, Add-on Manager and Discord
+
+Combined Store release for the translation feature and direct add-on manager,
+with the Discord tab represented by the final .1. See packaging/STORE-CHANGELOG.md
+for the complete submission notes. The portable release remains 0.1.45.
+
+## 0.1.45 / Store 0.3.8: Sparkles artwork and layout
+
+The dedicated Sparkles artwork matches the in-game icon. Add-ons now remeasures
+wrapped content after layout, fixing empty space at the bottom of the scroll
+range at some window sizes. Installation and saved data behaviour are unchanged.
+
+## 0.1.44 / Store 0.3.7: Sparkles artwork
+
+Sparkles now has its own original gold-star, herb and ore icon in Add-ons,
+matching the new in-game artwork. All Realmly add-ons now include copyable
+Discord invites on their welcome/main panels; update the add-ons to get them.
+Install, Update and Uninstall behaviour is unchanged.
+
+## 0.1.43 / Store 0.3.6: Uninstall and Discord
+
+Remove Chat Copy or Sparkles from Add-ons, with confirmation and settings kept.
+Forever must be closed. Before removing Sparkles, use Turn off & restore in-game.
+The new Discord tab offers a themed Join the Discord button for community,
+support and suggestions, opening the official invite when you click it.
+
+## 0.1.42 / Store 0.3.5: Streamlined Add-ons
+
+Removed the manual ZIP download buttons from Add-ons. Use Install or Update;
+the app handles downloading, verification and installation into Forever.
+Version checks, Up to date states and existing installation safeguards remain.
+
+## 0.1.41 / Store 0.3.4: Install optional add-ons in the app
+
+Add-ons now shows installed/latest versions and Install/Update buttons for Chat
+Copy and Sparkles. Select your WoW folder, close Forever, then install directly
+into its _forever_/Interface/AddOns folder. Downloads are verified and staged;
+SavedVariables, Retail and the main recorder are untouched. Checks run when the
+tab opens and through existing update checks. File replacement remains manual.
+Manual ZIP download buttons are still available.
+
+## 0.1.40 / Store 0.3.3: Optional Add-ons
+
+A separate Add-ons tab beside Translate offers Chat Copy and Sparkles for
+Forever. Download buttons open the official ZIPs in your browser; follow the
+on-page installation steps. No login or automatic installation is involved.
+Sparkles is now Realmly Sparkles in-game, with /rls and the existing /rlg alias.
+Its compatible install folder preserves settings and saved herb locations.
+
+## 0.1.39 / Store 0.3.2: Translate only or add a reply
+
+Use the themed Suggest a reply switch beside the large action button. Off shows
+Translate and returns only an English translation; on shows Translate & reply.
+Hidden reply guidance is not sent in translate-only mode and the server does
+not ask the AI to generate replies. Switching modes clears old results. The
+choice remains in memory until the app closes; chat text is never saved.
+
+## 0.1.38 / Store 0.3.1: Independent Translate tab
+
+A separate dark/gold Translate tab accepts pasted messages and optional reply
+guidance. It shows an English translation, detected language, and suggested
+reply in the source language plus English, with manual copy buttons. Requests
+use the paired account and a separate server endpoint; no character, setup,
+SavedVariables, screenshot, upload or chronicle data is included.
+
+Clear/cancel and editing protect against stale replies. Inputs/results stay in
+memory, never settings/history. There is no clipboard watcher or automatic game
+chat sending. OpenAI receives text only on Translate; review results before use.
+
+
 ## Store 0.3.0: Screenshot Manager release
 
 The Store release combines the screenshot library, recorded milestone matching,

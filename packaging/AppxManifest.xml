@@ -5,7 +5,7 @@
          xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
          IgnorableNamespaces="uap uap10 rescap">
   <!-- Build-Msix.ps1 fills these from Partner Center; do not upload the template. -->
-  <Identity Name="Realmly.Companion.Template" Publisher="CN=Template" Version="0.2.0.0" ProcessorArchitecture="x64" />
+  <Identity Name="Realmly.Companion.Template" Publisher="CN=Template" Version="0.5.1.0" ProcessorArchitecture="x64" />
   <Properties>
     <DisplayName>Realmly Companion</DisplayName>
     <PublisherDisplayName>Template</PublisherDisplayName>

@@ -54,6 +54,17 @@ internal static class UploadTests
             try { UploadPreview.Parse(bad, []); throw new Exception("Malformed/executable file accepted"); }
             catch (InvalidOperationException) { }
         }
+
+        // Social summaries are generic nested data; the uploader must not reinterpret actions.
+        const string socialSource = """
+            RealmlyDB={client="forever",profiles={Synthetic={adventurerId="social-fixture",character={name="Synthetic Hero",realm="Forever Test"},locations={{id="social-window-1",type="social",name="Offered helpful magic",capturedAt="2026-11-05T12:02:00Z",scopes={},party={},social={version=1,action="helpful_cast",direction="outgoing",category="healing_magic",evidence="cast_confirmed",source="player_spellcast",startedAt="2026-11-05T12:00:00Z",endedAt="2026-11-05T12:02:00Z",occurrences=5,distinctPeersObserved=2,peerCountComplete=true}}}}}}
+            """;
+        var socialPreview = UploadPreview.Parse(socialSource, []);
+        Assert(socialPreview.Records == 1 && socialPreview.NewRecords == 1 && socialPreview.Summary.Contains("2026-11-05"), "Generic social summary preview");
+        Assert(UploadPreview.Parse(socialSource, socialPreview.RecordKeys).NewRecords == 0, "Social summary deduplication");
+        using (var socialHttp = new HttpClient(new SnapshotHandler(socialSource)) { BaseAddress = new Uri("https://realmly.me/") })
+            Assert(new RealmlyApi(socialHttp).UploadSourceAsync(socialPreview.Source, "fixture-token", default).GetAwaiter().GetResult().Ok, "Anonymous social summary transported unchanged");
+
         // A realistic accumulated history remains well below the byte limit,
         // yet nested scope/metadata tables exceed the old 60,000-field ceiling.
         var records = string.Join(",", Enumerable.Range(1, 3000).Select(index =>

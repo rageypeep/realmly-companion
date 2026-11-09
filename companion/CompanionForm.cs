@@ -6,6 +6,7 @@ internal sealed class CompanionForm : RealmlyWindow
 {
     private readonly CompanionSettings _settings;
     private readonly RealmlyApi _api;
+    private readonly AddonsPanel _optionalAddons;
     private readonly ComboBox _client = new RealmlyComboBox() { DropDownStyle = ComboBoxStyle.DropDownList };
     private readonly TextBox _gameRoot = new();
     private readonly TextBox _savedVariables = new();
@@ -56,7 +57,7 @@ internal sealed class CompanionForm : RealmlyWindow
     private volatile bool _closing;
     private string _selectedSavedPath = "";
 
-    public CompanionForm(CompanionSettings? settings = null, Func<string, ClientKind, WowRunState>? detectWow = null, Action<string>? copyToClipboard = null, RealmlyApi? api = null, Func<IWin32Window, bool>? confirmAutomaticUploads = null, Action<string>? showAddonWarning = null)
+    public CompanionForm(CompanionSettings? settings = null, Func<string, ClientKind, WowRunState>? detectWow = null, Action<string>? copyToClipboard = null, RealmlyApi? api = null, Func<IWin32Window, bool>? confirmAutomaticUploads = null, Action<string>? showAddonWarning = null, Action<string>? openDiscord = null)
     {
         _settings = settings ?? CompanionSettings.Load();
         _api = api ?? new RealmlyApi();
@@ -159,7 +160,10 @@ internal sealed class CompanionForm : RealmlyWindow
         Add(_companionUpdate);
         Add(Actions(_checkCompanion, _options));
         scroll.SetContent(content);
-        SetWindowContent(scroll);
+        _optionalAddons = new AddonsPanel(() => _gameRoot.Text, _detectWow, canInstall: () => !_busy && !_closing);
+        _optionalAddons.UpdateAvailable += (addon, version) => _tray.NotifyUpdate("optional:" + addon.Id + ":" + version,
+            addon.Name + " " + version + " is ready. Close Forever, then open Add-ons to install it.", _settings.NotifyUpdates);
+        SetWindowContent(new RealmlyFeatureTabs(scroll, new TranslationPanel(_api, () => _settings.AccessToken, _copyToClipboard), _optionalAddons, new DiscordPanel(openDiscord)));
         Shown += (_, _) => scroll.ScrollTo(0);
 
         _client.SelectedIndexChanged += async (_, _) =>
@@ -360,7 +364,7 @@ internal sealed class CompanionForm : RealmlyWindow
         }
     }
 
-    private static void StyleButton(Button button, bool compact = false)
+    internal static void StyleButton(Button button, bool compact = false)
     {
         button.AutoSize = true;
         button.AutoSizeMode = AutoSizeMode.GrowAndShrink;
@@ -766,6 +770,7 @@ internal sealed class CompanionForm : RealmlyWindow
     {
         if (_busy || IsDisposed) return;
         if (Directory.Exists(_gameRoot.Text)) await CheckAddonAsync();
+        if (!IsDisposed) await _optionalAddons.CheckUpdatesAsync();
         if (!_busy && !IsDisposed) await BusyAsync("Checking Companion updates...", _ => CheckForCompanionUpdateAsync(manual: true), DiagnosticOperation.CompanionCheck);
     }
 

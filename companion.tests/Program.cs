@@ -45,6 +45,31 @@ internal static class Program
             DistributionTests.CheckStorePayload(args[payloadArgument + 1]);
             return;
         }
+        var optionalPackages = Array.IndexOf(args, "--optional-packages");
+        if (optionalPackages >= 0)
+        {
+            OptionalAddonTests.RealPackages(args[0], args[optionalPackages + 1]); return;
+        }
+        if (args.Contains("--optional-only"))
+        {
+            ApplicationConfiguration.Initialize(); OptionalAddonTests.Run(args[0]); return;
+        }
+        if (args.Contains("--discord-only"))
+        {
+            ApplicationConfiguration.Initialize(); DiscordTests.Run(args[0]); return;
+        }
+        if (args.Contains("--addons-only"))
+        {
+            ApplicationConfiguration.Initialize();
+            AddonsTests.Run(args[0]);
+            return;
+        }
+        if (args.Contains("--translation-only"))
+        {
+            ApplicationConfiguration.Initialize();
+            TranslationTests.Run(args[0]);
+            return;
+        }
         if (args.Contains("--automatic-only"))
         {
             ApplicationConfiguration.Initialize();
@@ -165,7 +190,7 @@ internal static class Program
         form.StartPosition = FormStartPosition.Manual;
         form.Location = new Point(-30000, -30000);
         form.Show();
-        Assert(Descendants(form).OfType<RealmlyScrollPanel>().Single().Offset == 0, "Initial focus unexpectedly scrolled away from page heading");
+        Assert(((RealmlyScrollPanel)typeof(CompanionForm).GetField("_mainScroll", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(form)!).Offset == 0, "Initial focus unexpectedly scrolled away from page heading");
         Assert(form.FormBorderStyle == FormBorderStyle.None, "Native title bar still enabled");
         using (var menu = form.BuildWindowMenu())
         {
@@ -273,7 +298,7 @@ internal static class Program
                 Assert(button.Width >= required.Width + button.Padding.Horizontal && button.Height >= required.Height + 6, "Clipped button: " + button.Text);
                 Assert(button.Right <= button.Parent!.ClientSize.Width, "Button outside parent: " + button.Text);
             }
-            var scroll = Descendants(form).OfType<RealmlyScrollPanel>().Single();
+            var scroll = (RealmlyScrollPanel)typeof(CompanionForm).GetField("_mainScroll", flags)!.GetValue(form)!;
             Assert(scroll.ContentWidth <= scroll.ViewportWidth, "Horizontal overflow");
             Assert(scroll.ContentWidth == scroll.ViewportWidth, "Content does not fill viewport width");
             scroll.ScrollTo(0);
@@ -298,6 +323,10 @@ internal static class Program
         TrayTests.Run(output);
         DistributionTests.Run();
         ThemeTests.Run(form, output);
+        TranslationTests.Run(output);
+        AddonsTests.Run(output);
+        DiscordTests.Run(output);
+        OptionalAddonTests.Run(output);
         SetupDiagnosticsTests.Run(output);
         AutomaticUploadTests.Run(output);
         ScreenshotTests.Run(output);

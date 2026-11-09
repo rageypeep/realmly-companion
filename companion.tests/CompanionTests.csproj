@@ -34,8 +34,19 @@
     <Compile Include="../companion/AutoUploadPolicy.cs" Link="AutoUploadPolicy.cs" />
     <Compile Include="../companion/ReadableCheckBox.cs" Link="ReadableCheckBox.cs" />
     <Compile Include="../companion/RealmlyTextBox.cs" Link="RealmlyTextBox.cs" />
+    <Compile Include="../companion/RealmlyFeatureTabs.cs" Link="RealmlyFeatureTabs.cs" />
+    <Compile Include="../companion/TranslationPanel.cs" Link="TranslationPanel.cs" />
+    <Compile Include="../companion/AddonsPanel.cs" Link="AddonsPanel.cs" />
+    <Compile Include="../companion/DiscordPanel.cs" Link="DiscordPanel.cs" />
+    <Compile Include="../companion/OptionalAddons.cs" Link="OptionalAddons.cs" />
     <Compile Include="../companion/SelfUpdater.cs" Link="SelfUpdater.cs" />
     <EmbeddedResource Include="../companion/SelfUpdate.ps1" LogicalName="RealmlyCompanion.SelfUpdate.ps1" />
     <EmbeddedResource Include="../companion/Assets/realmly-companion.ico" LogicalName="RealmlyCompanion.Icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="../companion/Assets/chat-copy.png" LogicalName="RealmlyCompanion.ChatCopy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="../companion/Assets/sparkles.png" LogicalName="RealmlyCompanion.Sparkles.png" />
   </ItemGroup>
 </Project>

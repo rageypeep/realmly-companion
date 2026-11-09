@@ -47,6 +47,20 @@ internal sealed class RealmlyApi
         return await Read<UploadResult>(response, cancellationToken);
     }
 
+    public async Task<ChatTranslation> TranslateAsync(string message, string replyIntent, string token, CancellationToken ct, bool includeReply = true)
+    {
+        TranslationResponse result;
+        try { result = await ScreenshotRequestAsync<TranslationResponse>("api/companion/translate", token,
+            new { message, replyIntent = includeReply ? replyIntent : "", includeReply, consent = true }, ct); }
+        catch (JsonException) { throw new InvalidOperationException("The translation response could not be read."); }
+        var value = result.Translation;
+        if (value is null || string.IsNullOrWhiteSpace(value.DetectedLanguage) || string.IsNullOrWhiteSpace(value.TranslationEnglish)
+            || value.SuggestedReply is null || value.SuggestedReplyEnglish is null
+            || (includeReply && (string.IsNullOrWhiteSpace(value.SuggestedReply) || string.IsNullOrWhiteSpace(value.SuggestedReplyEnglish))) || value.Notes is null || value.DetectedLanguage.Length > 100 || new[] { value.TranslationEnglish, value.SuggestedReply, value.SuggestedReplyEnglish, value.Notes }.Any(text => text.Length > 6000))
+            throw new InvalidOperationException("The translation response was incomplete.");
+        return includeReply ? value : value with { SuggestedReply = "", SuggestedReplyEnglish = "" };
+    }
+
     public Task<ScreenshotCharacters> ScreenshotCharactersAsync(string token, CancellationToken ct) =>
         ScreenshotRequestAsync<ScreenshotCharacters>("api/companion/screenshot-characters", token, null, ct);
 
@@ -107,3 +121,6 @@ internal sealed record ScreenshotDays(string[] Days);
 internal sealed record ScreenshotCandidate(string Id, string Title, string RequestedAtLocal);
 internal sealed record ScreenshotMatchResponse(ScreenshotCandidate[] Matches, ScreenshotCandidate[] Candidates);
 internal sealed record ScreenshotUploadResult(bool Ok, string Id);
+
+internal sealed record ChatTranslation(string DetectedLanguage, string TranslationEnglish, string SuggestedReply, string SuggestedReplyEnglish, string Notes);
+internal sealed record TranslationResponse(ChatTranslation? Translation);

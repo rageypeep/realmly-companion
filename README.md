@@ -14,8 +14,8 @@ your account, ready to turn into chronicles on the website.
 [Microsoft Store patch notes](packaging/STORE-CHANGELOG.md) include individual build
 changes and combined text for Store submissions.
 
-> **Release status:** This repository contains the Companion's 0.1.37 source and
-> regression tests, plus a separate 0.3.0 Microsoft Store packaging configuration.
+> **Release status:** This repository contains the Companion's 0.1.45 source and
+> regression tests, plus a separate 0.5.1 Microsoft Store packaging configuration.
 > Current website downloads are unsigned portable builds; a signed
 > customer release is not available yet.
 
@@ -28,6 +28,7 @@ changes and combined text for Store submissions.
 - **Connect securely** through approval in your browser. Battle.net sign-in stays
   on the website; you do not enter your Battle.net password in the Companion.
 - **Review before uploading** with character names, adventure dates and record counts.
+- **Translate pasted chat** in its own themed tab: see an English translation and a suggested reply in the source language plus English. Optional reply guidance and copy buttons keep you in control. Requires a connected account; sends only the pasted text and guidance to OpenAI when you click Translate, independently of characters, uploads and chronicles.
 - **Manage local screenshots** for each setup, preview images, match recorded milestones, and review private uploads. Originals stay untouched; captions, badges and social sharing are managed on Realmly.
 - **See upload history** and distinguish accepted uploads, duplicates and failures.
 - **Remember named setups** for different game installations and clients.
@@ -37,7 +38,7 @@ changes and combined text for Store submissions.
   rollback handling if replacement or restart fails.
 - **Copy a privacy-conscious diagnostic report** when you need help.
 
-The Companion uploads recorded adventures. It does **not** write or publish
+The Companion uploads recorded adventures and offers a separate manual translator. It does **not** write or publish
 social posts automatically; creating and publishing chronicles happens on Realmly.
 
 ## Getting started
@@ -207,3 +208,66 @@ Licensing this Companion does not license the private Realmly website code.
 
 Realmly is an independent fan project, not affiliated with or endorsed by
 Blizzard Entertainment.
+
+## Translate tab (0.1.45 / Store 0.5.1)
+
+Connect Realmly once in the Realmly tab, then open **Translate**. Paste up to
+3,000 characters and optionally describe your intended reply (up to 500
+characters). Click **Translate & reply**. Review the detected language,
+English translation and both versions of the suggested reply, then use the copy
+buttons or select text with Ctrl+C. The app never sends a reply into WoW.
+
+Only that message and guidance go through the separate authenticated
+`POST /api/companion/translate` endpoint. No character/setup data, Lua files or
+screenshots are included. No clipboard monitoring or chat collection occurs.
+Inputs/results stay in app memory, are not added to local history/settings or
+chronicles, and can be removed with **Clear** or by exiting the app (tray mode
+keeps the app running). Clear/cancel suppresses late results.
+
+The paired account token authorises this optional feature too. Server-side
+limits are ten attempts per minute, 100 per UTC day and one in-flight request
+per account. The OpenAI key remains on the server; the public client needs no
+API key. AI may misunderstand slang; check the reply before pasting it.
+
+In Translate, turn **Suggest a reply** off for **Translate** only, or on for
+**Translate & reply**. The large action button changes its label. Translate-only
+hides reply controls and sends no reply guidance; the AI is asked only for the
+translation and language, without generating suggested replies. The mode choice
+stays in memory for this app session. Existing versions still default to replies.
+
+## Optional Add-ons (0.1.45 / Store 0.5.1)
+
+Next to Translate, **Add-ons** offers **Chat Copy** and **Sparkles** for WoW
+Forever. Select the WoW folder in the Realmly tab. Each card shows installed and
+latest versions and an Install/Update button. The target is always that folder's
+`_forever_/Interface/AddOns`, even when the main recorder is set to Retail.
+
+Opening Add-ons checks a small official release catalog. The existing tray
+update-check cycle also checks these add-ons and uses the existing notification
+preference. Checks never install silently. Click Install or Update with Forever
+closed; the app downloads a versioned ZIP, verifies SHA-256 and the TOC, stages
+it and replaces only that add-on folder. A failed replacement restores the old
+copy. The app rechecks game state and selected setup before replacement, rejects
+unsafe archives and downgrades, and preserves SavedVariables and other add-ons.
+No account connection is required. The app handles all add-on downloads and installation.
+
+In game, the brands are **Realmly Chat Copy** and **Realmly Sparkles**. Sparkles
+keeps its `RealmlyGathering` folder and SavedVariables identity, preserving
+preferences and saved herb locations. `/rls` and `/rlg` both open it.
+
+## Uninstall and Discord (0.1.45 / Store 0.5.1)
+
+Add-ons includes an Uninstall button for each optional tool. Confirmation shows
+the exact Forever folder; game-state, path and setup checks also apply to removal.
+Only that add-on folder is removed. SavedVariables, herb history, Retail and the
+main recorder stay untouched. For Sparkles, use /rls > Turn off & restore in-game
+before closing Forever and uninstalling it. Reinstall remains available later.
+
+The separate Discord tab has a large Join the Discord button, a selectable invite
+link and community/support information. It opens https://discord.gg/Js2mcA7w9
+only when clicked. Discord handles joining/sign-in; the app never joins for you.
+
+The Sparkles card embeds the dedicated Realmly Sparkles artwork, also used
+in-game. Its source PNG is `companion/Assets/sparkles.png`. Current optional
+releases are Chat Copy 0.1.4 and Sparkles 0.2.2, both with copy-ready Discord
+invites. The main Retail/Forever recorder 0.8.22 also includes community links.
