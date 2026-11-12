@@ -280,4 +280,4 @@ Portable equivalent: 0.1.26.
 - Building an MSIX or publishing a portable update does not mark a Store release as submitted or published.
 
 For technical implementation details, see [the Companion development notes](../companion/README.md).
-For package creation, see [the Store packaging guide](README.md).
+For package creation, see [the Store packaging guide](../packaging/README.md).

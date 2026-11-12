@@ -3,7 +3,7 @@
 ## Microsoft Store 0.5.1: Translate, Add-on Manager and Discord
 
 Combined Store release for the translation feature and direct add-on manager,
-with the Discord tab represented by the final .1. See packaging/STORE-CHANGELOG.md
+with the Discord tab represented by the final .1. See docs/store-changelog.md
 for the complete submission notes. The portable release remains 0.1.45.
 
 ## 0.1.45 / Store 0.3.8: Sparkles artwork and layout
@@ -75,7 +75,7 @@ chat sending. OpenAI receives text only on Translate; review results before use.
 The Store release combines the screenshot library, recorded milestone matching,
 private uploads, destination recovery and themed/DPI-aware controls described
 below. Its portable equivalent remains 0.1.37. See the combined Store submission
-notes in `packaging/STORE-CHANGELOG.md`.
+notes in `docs/store-changelog.md`.
 
 ## 0.1.37 / Store 0.2.11: Dropdown clipping
 
@@ -333,7 +333,7 @@ explanations are hover hints rather than permanent paragraphs.
   turn a confirmed server upload into a failed upload.
 
 Tests use data-only fixtures and an HTTP stub (no real uploads), plus offscreen
-normal/narrow WinForms rendering. The roadmap is tracked in [TODO.md](TODO.md).
+normal/narrow WinForms rendering. The roadmap is tracked in [TODO.md](../docs/roadmap.md).
 
 ## 0.1.18: border/repaint correction
 

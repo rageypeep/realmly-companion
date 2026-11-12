@@ -1,5 +1,7 @@
 # Realmly Companion
 
+[Documentation index, roadmaps and feature ideas](docs/README.md).
+
 **Bring your adventures home.**
 
 Realmly Companion is a Windows desktop app that connects your World of Warcraft
@@ -11,7 +13,7 @@ your account, ready to turn into chronicles on the website.
 [Get the addon](https://realmly.me/addon) ·
 [Report an issue](https://github.com/rageypeep/realmly-companion/issues)
 
-[Microsoft Store patch notes](packaging/STORE-CHANGELOG.md) include individual build
+[Microsoft Store patch notes](docs/store-changelog.md) include individual build
 changes and combined text for Store submissions.
 
 > **Release status:** This repository contains the Companion's 0.1.45 source and

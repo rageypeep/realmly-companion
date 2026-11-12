@@ -1,6 +1,6 @@
 # Microsoft Store package
 
-[Store patch notes and combined submission text](STORE-CHANGELOG.md) are kept separately
+[Store patch notes and combined submission text](../docs/store-changelog.md) are kept separately
 from portable releases. Use them to combine changes when skipping Store builds.
 
 This creates a self-contained Windows x64 MSIX of the existing WinForms app.
